@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { X, Save, Plus, Trash2, Bot, Sparkles, Building, Phone, Globe, Layers } from 'lucide-react';
-import { BusinessConfig, saveBusinessConfig } from '../services/api';
+import { X, Save, Plus, Trash2, Bot, Sparkles, Building, Phone, Globe, Layers, RotateCcw } from 'lucide-react';
+import { BusinessConfig, saveBusinessConfig, OFFICIAL_KNOWLEDGE_BASE } from '../services/api';
 
 interface KnowledgeBaseModalProps {
   isOpen: boolean;
@@ -17,7 +17,13 @@ export const KnowledgeBaseModal: React.FC<KnowledgeBaseModalProps> = ({
   theme = 'night',
   onConfigUpdated,
 }) => {
-  const [formData, setFormData] = useState<BusinessConfig>({ ...config });
+  const [formData, setFormData] = useState<BusinessConfig>(() => {
+    const base = { ...config };
+    if (!base.systemPromptAddendum || base.systemPromptAddendum.includes('Conectacard')) {
+      base.systemPromptAddendum = OFFICIAL_KNOWLEDGE_BASE;
+    }
+    return base;
+  });
   const [newQuestion, setNewQuestion] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
@@ -199,12 +205,18 @@ export const KnowledgeBaseModal: React.FC<KnowledgeBaseModalProps> = ({
                 }`}
               >
                 <Globe className="w-3.5 h-3.5 text-cyan-500" />
-                Site Conectacard:
+                Website Oficial:
               </label>
               <input
                 type="text"
-                value={formData.websiteConectacard}
-                onChange={(e) => setFormData({ ...formData, websiteConectacard: e.target.value })}
+                value={formData.website || formData.websiteConectacard || 'https://www.startmktlocal.com.br/'}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    website: e.target.value,
+                    websiteConectacard: e.target.value,
+                  })
+                }
                 className={`rounded-xl px-3 py-2 text-xs border focus:outline-none focus:border-emerald-500 ${
                   isDay
                     ? 'bg-slate-50 border-slate-200 text-slate-900'
@@ -220,12 +232,18 @@ export const KnowledgeBaseModal: React.FC<KnowledgeBaseModalProps> = ({
                 }`}
               >
                 <Globe className="w-3.5 h-3.5 text-amber-500" />
-                Site Superlimpo:
+                Modelo de Biosite / Portfólio:
               </label>
               <input
                 type="text"
-                value={formData.websiteSuperlimpo}
-                onChange={(e) => setFormData({ ...formData, websiteSuperlimpo: e.target.value })}
+                value={formData.catalogUrl || 'https://vicenteiaguebiositegoogleia.vercel.app/'}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    catalogUrl: e.target.value,
+                    websiteSuperlimpo: e.target.value,
+                  })
+                }
                 className={`rounded-xl px-3 py-2 text-xs border focus:outline-none focus:border-emerald-500 ${
                   isDay
                     ? 'bg-slate-50 border-slate-200 text-slate-900'
@@ -295,28 +313,52 @@ export const KnowledgeBaseModal: React.FC<KnowledgeBaseModalProps> = ({
           </div>
 
           {/* Section 4: Custom System Prompt Instructions */}
-          <div className="flex flex-col gap-1.5">
-            <label
-              className={`text-xs font-semibold flex items-center gap-1.5 ${
-                isDay ? 'text-slate-700' : 'text-slate-300'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              Instruções Adicionais para a IA (Diretrizes Específicas):
-            </label>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <label
+                className={`text-xs font-semibold flex items-center gap-1.5 ${
+                  isDay ? 'text-slate-700' : 'text-slate-300'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                Base de Conhecimento & Diretrizes da LIA:
+              </label>
+              <button
+                type="button"
+                onClick={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    companyName: 'Start Mkt Local',
+                    botName: 'LIA',
+                    botRole: 'Especialista de atendimento e vendas',
+                    businessPhone: '+55 67 99317-4512',
+                    website: 'https://www.startmktlocal.com.br/',
+                    catalogUrl: 'https://www.startmktlocal.com.br/',
+                    systemPromptAddendum: OFFICIAL_KNOWLEDGE_BASE,
+                  }))
+                }
+                className={`text-[11px] font-semibold px-2.5 py-1 rounded-lg border flex items-center gap-1 transition ${
+                  isDay
+                    ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-300'
+                    : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                }`}
+              >
+                <RotateCcw className="w-3 h-3" /> Restaurar Base Oficial Start Mkt Local
+              </button>
+            </div>
             <textarea
-              rows={4}
+              rows={8}
               value={formData.systemPromptAddendum}
               onChange={(e) => setFormData({ ...formData, systemPromptAddendum: e.target.value })}
-              placeholder="Ex: Estamos em promoção de Black Friday com 20% OFF no Cartão Metal. O frete é grátis para todo o Brasil em compras acima de R$ 100..."
-              className={`rounded-xl p-3 text-xs border focus:outline-none focus:border-emerald-500 resize-none font-mono leading-relaxed ${
+              placeholder="Cole aqui a base de conhecimento completa da empresa..."
+              className={`rounded-xl p-3 text-xs border focus:outline-none focus:border-emerald-500 resize-y font-mono leading-relaxed ${
                 isDay
                   ? 'bg-slate-50 border-slate-200 text-slate-900'
                   : 'bg-[#10121a] border-slate-700 text-white'
               }`}
             />
             <p className={`text-[11px] ${isDay ? 'text-slate-500' : 'text-slate-400'}`}>
-              Essas diretrizes são passadas diretamente para a API do Google Gemini em todas as respostas automáticas.
+              Essa base de conhecimento é utilizada para todas as respostas inteligentes e regras de atendimento da LIA.
             </p>
           </div>
 

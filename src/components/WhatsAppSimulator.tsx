@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { BusinessConfig, ChatMessage, sendChatMessage } from '../services/api';
 import { VoiceNoteBubble } from './VoiceNoteBubble';
+import { FormattedMessageText } from './FormattedMessageText';
 import { createSampleVoiceAudioUrl } from '../utils/audioHelper';
 
 interface WhatsAppSimulatorProps {
@@ -36,7 +37,7 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
     {
       id: 'wa-msg-1',
       role: 'assistant',
-      text: `Olá! Eu sou a ${config.botName}, assistente virtual inteligente da Conectacard. Estou aqui para tirar suas dúvidas, apresentar nossos serviços e ajudar você a encontrar a melhor solução. Pode perguntar!`,
+      text: `Olá! Eu sou a ${config.botName}, especialista de atendimento e vendas da **${config.companyName}**. Estou aqui para tirar dúvidas sobre nossos serviços de Marketing Digital e alavancar suas vendas. Como posso te ajudar hoje?`,
       timestamp: '08:35',
       status: 'read',
     },
@@ -198,7 +199,7 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
 
     const queryText =
       sampleQuestionText ||
-      'Olá LIA! Gostaria de saber os valores do Cartão NFC e os produtos da Superlimpo.';
+      'Olá LIA! Gostaria de saber os valores para Criação de Sites e Biosite com IA.';
 
     const timeStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     const audioUrl = createSampleVoiceAudioUrl();
@@ -288,7 +289,7 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
                 </span>
               </div>
               <span className="text-[11px] text-emerald-100/90 font-normal">
-                {isLoading ? 'digitando...' : 'Online • Conectacard'}
+                {isLoading ? 'digitando...' : `Online • ${config.companyName}`}
               </span>
             </div>
           </div>
@@ -300,7 +301,7 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
                   {
                     id: `wa-init-${Date.now()}`,
                     role: 'assistant',
-                    text: `Olá! Eu sou a ${config.botName}, assistente virtual inteligente da Conectacard. Como posso ajudar?`,
+                    text: `Olá! Eu sou a ${config.botName}, especialista de atendimento e vendas da **${config.companyName}**. Como posso ajudar?`,
                     timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
                     status: 'read',
                   },
@@ -398,7 +399,12 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
                       : 'bg-[#202c33] text-slate-100 rounded-tl-none'
                   }`}
                 >
-                  <p className="whitespace-pre-wrap">{m.text}</p>
+                  <FormattedMessageText
+                    text={m.text}
+                    isUser={m.role === 'user'}
+                    theme={theme}
+                    variant="whatsapp"
+                  />
 
                 {/* Human handoff card in WhatsApp */}
                 {m.needsHumanHandoff && (

@@ -16,6 +16,7 @@ import {
 import { BusinessConfig, ChatMessage, sendChatMessage, sendChatAudio, fetchAudioTts } from '../services/api';
 import { AudioPlayer } from './AudioPlayer';
 import { VoiceNoteBubble } from './VoiceNoteBubble';
+import { FormattedMessageText } from './FormattedMessageText';
 import { createSampleVoiceAudioUrl } from '../utils/audioHelper';
 
 interface ChatInterfaceProps {
@@ -37,7 +38,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     {
       id: 'msg-init-1',
       role: 'assistant',
-      text: `Olá! Eu sou a ${config.botName}, assistente virtual inteligente da Conectacard. Estou aqui para tirar suas dúvidas, apresentar nossos serviços e ajudar você a encontrar a melhor solução. Pode perguntar!`,
+      text: `Olá! Eu sou a ${config.botName}, especialista de atendimento e vendas da **${config.companyName}**. Estou aqui para tirar dúvidas sobre nosso catálogo de serviços e te ajudar a escolher a melhor solução para sua empresa. Como posso te ajudar hoje?`,
       timestamp: '08:35',
       status: 'read',
     },
@@ -210,7 +211,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
     const queryText =
       sampleQuestionText ||
-      'Olá LIA! Gostaria de saber os valores do Cartão NFC e os produtos da Superlimpo.';
+      'Olá LIA! Gostaria de saber os valores para Criação de Sites e Biosite com IA.';
 
     const nowTime = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     const audioUrl = createSampleVoiceAudioUrl();
@@ -268,7 +269,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       {
         id: `init-${Date.now()}`,
         role: 'assistant',
-        text: `Olá! Eu sou a ${config.botName}, assistente virtual inteligente da Conectacard. Estou aqui para tirar suas dúvidas, apresentar nossos serviços e ajudar você a encontrar a melhor solução. Pode perguntar!`,
+        text: `Olá! Eu sou a ${config.botName}, especialista de atendimento e vendas da **${config.companyName}**. Como posso ajudar você hoje?`,
         timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
         status: 'read',
       },
@@ -483,10 +484,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                       : 'bg-[#222534] text-slate-100 rounded-tl-xs border border-[#31364d]'
                   }`}
                 >
-                  {/* Message Content */}
-                  <div className="whitespace-pre-wrap font-normal break-words">
-                    {msg.text}
-                  </div>
+                  {/* Message Content with Clickable Links */}
+                  <FormattedMessageText
+                    text={msg.text}
+                    isUser={msg.role === 'user'}
+                    theme={theme}
+                    variant="chat"
+                  />
 
                   {/* Audio Generation / Player on LIA messages */}
                   {msg.role === 'assistant' && (

@@ -32,23 +32,27 @@ export default function App() {
   });
 
   const [config, setConfig] = useState<BusinessConfig>({
-    companyName: 'Conectacard & Superlimpo',
+    companyName: 'Start Mkt Local',
     botName: 'LIA',
-    botRole: 'Assistente virtual inteligente',
-    businessPhone: '+55 67 99317-4612',
-    websiteConectacard: 'https://conectacard.com.br',
-    websiteSuperlimpo: 'https://superlimpo.com.br',
-    catalogUrl: 'https://superlimpo.com.br/produtos',
+    botRole: 'Especialista de atendimento e vendas',
+    businessPhone: '+55 67 99317-4512',
+    website: 'https://www.startmktlocal.com.br/',
+    websiteConectacard: 'https://www.startmktlocal.com.br/',
+    websiteSuperlimpo: 'https://www.startmktlocal.com.br/',
+    catalogUrl: 'https://www.startmktlocal.com.br/',
     whatsappVerifyToken: 'lia_token_whatsapp_2026',
     whatsappAccessToken: '',
     whatsappPhoneNumberId: '',
     quickQuestions: [
       'Quais são os serviços?',
       'Quanto custa?',
-      'Qual o site da Superlimpo?',
-      'Quero falar com alguém',
-      'Como funciona o cartão NFC?',
-      'Produtos Superlimpo',
+      'Criação de Sites',
+      'Biosite com Atendimento IA',
+      'Avaliacard NFC Google',
+      'Gestor Google Meu Negócio',
+      'Tráfego Meta Ads',
+      'Agente IA WhatsApp',
+      'Falar com Especialista',
     ],
     systemPromptAddendum: '',
   });
@@ -388,7 +392,7 @@ export default function App() {
       >
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span>{config.botName} Chatbot • Conectacard & Superlimpo</span>
+            <span>{config.botName} Chatbot • {config.companyName}</span>
             <span className="w-1 h-1 rounded-full bg-slate-400"></span>
             <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-medium">
               <Shield className="w-3 h-3" /> Respostas automáticas via Google Gemini

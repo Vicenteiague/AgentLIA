@@ -32,8 +32,9 @@ export interface BusinessConfig {
   botName: string;
   botRole: string;
   businessPhone: string;
-  websiteConectacard: string;
-  websiteSuperlimpo: string;
+  website: string;
+  websiteConectacard?: string;
+  websiteSuperlimpo?: string;
   catalogUrl: string;
   whatsappVerifyToken: string;
   whatsappAccessToken: string;
@@ -42,26 +43,109 @@ export interface BusinessConfig {
   systemPromptAddendum: string;
 }
 
+export const OFFICIAL_KNOWLEDGE_BASE = `# 1. IDENTIDADE E OBJETIVO
+- **Nome do Agente:** LIA
+- **Empresa:** Start Mkt Local
+- **Papel:** Especialista de atendimento e vendas.
+- **Tom de Voz:** Direto, simpático, consultivo e focado em conversão (mensagens curtas, ideais para leitura no celular).
+- **Objetivo Principal:** Tirar dúvidas sobre o catálogo e conduzir o cliente para o fechamento no WhatsApp.
+
+---
+
+# 2. DADOS DA EMPRESA (Fatos Gerais)
+- **O que fazemos:** Agência de marketing digital
+- **Localização:** Ponta Porã MS atuamos em todo Brasil
+- **Horário de Funcionamento:** Segunda a Sexta, das 08h às 18h | Sábado, das 08h às 12h.
+- **Formas de Pagamento:** PIX , Cartão em até 3x sem juros, Cartão de Débito.
+- **Link de Contato/WhatsApp:** https://wa.me/5567993174512
+- **Link de Contato/Website:** https://www.startmktlocal.com.br/
+
+---
+
+# 3. CATÁLOGO DE PRODUTOS E SERVIÇOS (Tópicos Chave-Valor)
+
+## Produto/Serviço 1: Criação de Sites
+- **Para quem é indicado:** Empresas em geral
+- **O que inclui:** Destaque no meio digital
+- **Prazo de entrega:** 7 dias
+- **Valor:** A partir R$ 500,00
+
+## Produto/Serviço 2: Gestor Google meu Negócio
+- **Para quem é indicado:** Empresas de todo o Brasil
+- **O que inclui:** Criação e gestão de perfis de empresas no Google
+- **Valor:** R$ A combinar
+
+## Produto/Serviço 3: Criação de Biosites com atendimento Virtual
+- **Modelo de Biosite:** https://vicenteiaguebiositegoogleia.vercel.app/
+- **Para quem é indicado:** Empresas de todo o Brasil
+- **O que inclui:** Criação de Biosites com atendimento 24 hrs por agentes de IA treinado para saber tudo da sua empresa
+- **Valor:** R$ 167.00 mais R$50.00 Mês de manutenção do Agente de IA
+
+## Produto/Serviço 4: Gestor de tráfego Meta Ads
+- **Para quem é indicado:** Empresas de todo o Brasil
+- **O que inclui:** Criação de campanhas de marketing na Meta Ads
+- **Valor:** R$ A combinar
+
+## Produto/Serviço 5: Criação de Agente de IA para atendimento no WhatsApp
+- **Para quem é indicado:** Empresas de todo o Brasil
+- **O que inclui:** Criação de Agentes de IA no whatsapp da empresa responsável pelo atendimento e conhecimento total da empresa
+- **Valor:** R$ A combinar
+
+## Produto/Serviço 6: Criação do Avaliacard cartão NFC e QR Code de avaliação do Google
+- **Website:** https://avaliacard.vercel.app/
+- **Para quem é indicado:** Empresas de todo o Brasil
+- **O que inclui:** Criação do cartão NFC e QR Code com link direto na página de avaliação do Google
+- **Valor:** R$ 89.00 + Frete grátis
+
+---
+
+# 4. FAQ E QUEBRA DE OBJEÇÕES (Como responder)
+
+**P: Vocês dão desconto se eu fechar hoje?**
+R: No pagamento via PIX já aplicamos 5% de desconto imediato! Se você quiser fechar um pacote com mais de um item, posso chamar nosso especialista no WhatsApp para liberar uma condição especial para você.
+
+**P: Como funciona a garantia?**
+R: Você tem 15 dias de garantia total. Se tiver qualquer problema, resolvemos sem burocracia.
+
+**P: Achei o valor alto / Vou pensar.**
+R: Entendo perfeitamente! Mas vale lembrar que todos os nossos produtos são de alto desempenho para alavancagem dos Negócios Locais, o que economiza tempo/dinheiro para você. Quer que eu te mostre a opção de parcelamento para caber tranquilo no seu orçamento?
+
+---
+
+# 5. TODOS OS LINKS QUE ENVIAR DEVE SER CLICÁVEL
+- Envie sempre em formato de link clicável (ex: [https://wa.me/5567993174512](https://wa.me/5567993174512), [https://www.startmktlocal.com.br/](https://www.startmktlocal.com.br/), [https://vicenteiaguebiositegoogleia.vercel.app/](https://vicenteiaguebiositegoogleia.vercel.app/), [https://avaliacard.vercel.app/](https://avaliacard.vercel.app/)).
+
+---
+
+# 6. REGRAS DE OURO (Guardrails)
+1. **Fidelidade aos Dados:** Responda APENAS com base nas informações acima. Se o cliente perguntar algo que não está neste documento, diga exatamente: "Para te confirmar esse detalhe específico sem erro, vou te passar o contato direto do nosso especialista: [- **Link de Contato/WhatsApp:** https://wa.me/5567993174512]".
+2. **Proibido Inventar:** Nunca invente preços, prazos, promoções ou serviços que não estejam na seção 3.
+3. **Formatação:** Nunca envie blocos gigantes de texto. Use no máximo 3 linhas por parágrafo e termine sempre com uma pergunta que leve o cliente para o próximo passo.`;
+
 let config: BusinessConfig = {
-  companyName: process.env.COMPANY_NAME || 'Conectacard & Superlimpo',
+  companyName: process.env.COMPANY_NAME || 'Start Mkt Local',
   botName: process.env.BOT_NAME || 'LIA',
-  botRole: 'Assistente virtual inteligente',
-  businessPhone: process.env.BUSINESS_PHONE || '+55 67 99317-4612',
-  websiteConectacard: process.env.WEBSITE_CONECTACARD || 'https://conectacard.com.br',
-  websiteSuperlimpo: process.env.WEBSITE_SUPERLIMPO || 'https://superlimpo.com.br',
-  catalogUrl: process.env.CATALOG_URL || 'https://superlimpo.com.br/produtos',
+  botRole: 'Especialista de atendimento e vendas',
+  businessPhone: process.env.BUSINESS_PHONE || '+55 67 99317-4512',
+  website: process.env.WEBSITE || 'https://www.startmktlocal.com.br/',
+  websiteConectacard: 'https://www.startmktlocal.com.br/',
+  websiteSuperlimpo: 'https://www.startmktlocal.com.br/',
+  catalogUrl: process.env.CATALOG_URL || 'https://www.startmktlocal.com.br/',
   whatsappVerifyToken: process.env.WHATSAPP_VERIFY_TOKEN || 'lia_token_whatsapp_2026',
   whatsappAccessToken: process.env.WHATSAPP_ACCESS_TOKEN || '',
   whatsappPhoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID || '',
   quickQuestions: [
     'Quais são os serviços?',
     'Quanto custa?',
-    'Qual o site da Superlimpo?',
-    'Quero falar com alguém',
-    'Como funciona o cartão NFC?',
-    'Produtos Superlimpo',
+    'Criação de Sites',
+    'Biosite com Atendimento IA',
+    'Avaliacard NFC Google',
+    'Gestor Google Meu Negócio',
+    'Tráfego Meta Ads',
+    'Agente IA WhatsApp',
+    'Falar com Especialista',
   ],
-  systemPromptAddendum: '',
+  systemPromptAddendum: OFFICIAL_KNOWLEDGE_BASE,
 };
 
 // Webhook simulation / activity log
@@ -87,20 +171,23 @@ const webhookLogs: WebhookLog[] = [
 ];
 
 function buildSystemPrompt() {
-  return `Você é a ${config.botName}, assistente virtual inteligente da ${config.companyName}.
-Responda de forma ágil, simpática, objetiva e clara em português brasileiro.
+  return `Você é a ${config.botName}, ${config.botRole} da ${config.companyName}.
+Responda de forma direta, simpática, consultiva e focada em conversão, ideal para leitura rápida no celular (máximo de 3 linhas por parágrafo, terminando sempre com uma pergunta para o próximo passo).
 
-BASE DE CONHECIMENTO:
-1. Conectacard (Cartões NFC Inteligentes):
-   - O que é: Cartão por aproximação com chip NFC e QR Code. Compartilha contatos, redes sociais, WhatsApp e chave PIX ao aproximar do celular.
-   - Vantagens: Sem necessidade de app (abre no navegador), dados editáveis na nuvem, sustentável e moderno.
-   - Valores: Cartão Individual PVC R$ 79,90 (frete grátis, sem mensalidade) | Cartão Metal Executive R$ 149,90 | Plano Corporate a partir de 5 unidades: R$ 59,90/unidade.
-2. Superlimpo (Saneantes Profissionais):
-   - Linha profissional de higienização concentrada para empresas e condomínios.
-   - Site: ${config.websiteSuperlimpo} | Catálogo: ${config.catalogUrl}
-3. Atendimento Humano:
-   - Se solicitarem atendente ou pessoa, forneça o WhatsApp ${config.businessPhone}.
-${config.systemPromptAddendum ? `\nDIRETRIZES DA EMPRESA:\n${config.systemPromptAddendum}` : ''}
+BASE DE CONHECIMENTO OFICIAL E DIRETRIZES:
+${OFFICIAL_KNOWLEDGE_BASE}
+
+DIRETRIZES CRÍTICAS DE PRECISÃO:
+1. Se o cliente perguntar "qual o site da agência", "qual o site de vocês", "qual seu site" ou pedir o link/site da Start Mkt Local, responda OBRIGATORIAMENTE informando o website oficial da agência: [https://www.startmktlocal.com.br/](https://www.startmktlocal.com.br/). NÃO confunda isso com o serviço de contratação de Criação de Sites.
+2. Se o cliente perguntar sobre o serviço de Criação de Sites (para criar um site para a empresa dele), informe que criamos sites a partir de R$ 500,00 com entrega em 7 dias.
+3. Se perguntar sobre o Biosite com IA ou quiser ver modelo/exemplo, informe o valor de R$ 167,00 + R$ 50,00/mês e o link do modelo: [https://vicenteiaguebiositegoogleia.vercel.app/](https://vicenteiaguebiositegoogleia.vercel.app/).
+4. Se perguntar sobre o Avaliacard NFC, informe R$ 89,00 com Frete Grátis e o link: [https://avaliacard.vercel.app/](https://avaliacard.vercel.app/Platform).
+5. Se perguntar sobre contato, WhatsApp ou atendimento humano, envie o link clicável: [https://wa.me/5567993174512](https://wa.me/5567993174512) e o telefone ${config.businessPhone}.
+6. Se perguntar onde fica ou horário, responda Ponta Porã - MS (atendemos todo Brasil), Seg a Sex 08h-18h e Sáb 08h-12h.
+7. Todos os links enviados devem ser em Markdown clicável [Texto](URL) e reais.
+8. Nunca invente dados fora da base de conhecimento oficial.
+
+${config.systemPromptAddendum && config.systemPromptAddendum !== OFFICIAL_KNOWLEDGE_BASE ? `\nINSTRUÇÕES ADICIONAIS:\n${config.systemPromptAddendum}` : ''}
 `;
 }
 
@@ -111,26 +198,16 @@ function findKnowledgeBaseAnswer(
 ): { reply: string; needsHumanHandoff: boolean } | null {
   const q = query.toLowerCase().trim();
 
-  // 1. Directives in systemPromptAddendum (custom database)
-  if (cfg.systemPromptAddendum && cfg.systemPromptAddendum.trim().length > 0) {
-    const lines = cfg.systemPromptAddendum.split('\n').map((l) => l.trim()).filter(Boolean);
+  // 1. Directives in systemPromptAddendum (custom additions)
+  if (cfg.systemPromptAddendum && cfg.systemPromptAddendum !== OFFICIAL_KNOWLEDGE_BASE) {
+    const lines = cfg.systemPromptAddendum.split('\n').map((l) => l.trim()).filter((l) => l.length > 5 && !l.startsWith('#'));
     for (const line of lines) {
       const lowerLine = line.toLowerCase();
       const queryWords = q.split(/[\s,?.!]+/).filter((w) => w.length >= 4);
       const matches = queryWords.filter((w) => lowerLine.includes(w));
-      if (
-        matches.length >= 2 ||
-        (queryWords.length === 1 &&
-          matches.length === 1 &&
-          (lowerLine.includes('frete') ||
-            lowerLine.includes('horário') ||
-            lowerLine.includes('endereço') ||
-            lowerLine.includes('promoção') ||
-            lowerLine.includes('desconto') ||
-            lowerLine.includes('prazo')))
-      ) {
+      if (matches.length >= 2) {
         return {
-          reply: `Olá! Conforme nossas diretrizes: ✨\n\n${line}\n\nPosso te ajudar com mais detalhes sobre isso?`,
+          reply: `Olá! Conforme nossas informações:\n\n${line}\n\nQuer que eu te passe mais detalhes sobre isso?`,
           needsHumanHandoff: false,
         };
       }
@@ -150,19 +227,93 @@ function findKnowledgeBaseAnswer(
     q === 'olá!' ||
     q === 'oi lia' ||
     q === 'olá lia' ||
-    q === 'ola lia'
+    q === 'ola lia' ||
+    q === 'ola tudo bem' ||
+    q === 'olá tudo bem' ||
+    q === 'opa' ||
+    q === 'e ai' ||
+    q === 'e aí'
   ) {
     return {
-      reply: `Olá! 👋 Eu sou a ${cfg.botName}, assistente virtual inteligente da ${cfg.companyName}.\n\nEstou aqui para tirar dúvidas sobre nossos **Cartões Inteligentes NFC Conectacard** e nossa linha de **Produtos Superlimpo**. Como posso te ajudar hoje?`,
+      reply: `Olá! Eu sou a ${cfg.botName}, especialista de atendimento e vendas da **${cfg.companyName}**.\n\nAjudamos empresas de todo o Brasil a venderem mais com Sites, Biosites com IA, Google Meu Negócio, Tráfego Pago e Agentes de WhatsApp.\n\nQual dessas soluções você gostaria de conhecer hoje?`,
       needsHumanHandoff: false,
     };
   }
 
-  // 3. Human Handoff / Talk to someone
+  // 3. Website Oficial da Agência / Link da Empresa (Prioritário para nunca confundir com o serviço de criar sites)
+  const agencySitePatterns = [
+    'qual o site',
+    'qual e o site',
+    'qual é o site',
+    'qual seu site',
+    'qual o website',
+    'qual a pagina',
+    'qual a página',
+    'site da agência',
+    'site da agencia',
+    'site da empresa',
+    'site de vocês',
+    'site de voces',
+    'site do negócio',
+    'link do site',
+    'link da agência',
+    'link da agencia',
+    'link da empresa',
+    'passa o site',
+    'manda o site',
+    'ver o site',
+    'endereço do site',
+    'endereco do site',
+    'pagina da empresa',
+    'página da empresa',
+    'website oficial',
+    'site oficial',
+    'vocês têm site',
+    'voces tem site',
+    'tem site',
+    'startmktlocal',
+    'start mkt local',
+  ];
+  const isAskingAgencySite =
+    agencySitePatterns.some((pattern) => q.includes(pattern)) ||
+    q === 'site' ||
+    q === 'website' ||
+    q === 'o site' ||
+    q === 'qual o site?';
+
+  if (isAskingAgencySite) {
+    return {
+      reply: `O website oficial da **Start Mkt Local** é: [https://www.startmktlocal.com.br/](https://www.startmktlocal.com.br/).\n\nLá você pode conferir nossos serviços, portfólio e diferenciais! Você também pode falar direto com nosso especialista no WhatsApp: [https://wa.me/5567993174512](https://wa.me/5567993174512).\n\nQual serviço da nossa agência você gostaria de conhecer melhor?`,
+      needsHumanHandoff: false,
+    };
+  }
+
+  // 4. Todos os Links Oficiais / Links Clicáveis
+  const allLinksPatterns = [
+    'links',
+    'manda os links',
+    'mandar os links',
+    'passa os links',
+    'quais os links',
+    'quais são os links',
+    'links clicaveis',
+    'links clicáveis',
+    'todos os links',
+  ];
+  if (allLinksPatterns.some((p) => q.includes(p))) {
+    return {
+      reply: `Aqui estão todos os links oficiais da **Start Mkt Local** clicáveis para você acessar:\n\n🌐 **Website Oficial:**\n[https://www.startmktlocal.com.br/](https://www.startmktlocal.com.br/)\n\n💬 **WhatsApp do Especialista:**\n[https://wa.me/5567993174512](https://wa.me/5567993174512)\n\n📱 **Modelo Biosite IA:**\n[https://vicenteiaguebiositegoogleia.vercel.app/](https://vicenteiaguebiositegoogleia.vercel.app/)\n\n⭐ **Website Avaliacard NFC:**\n[https://avaliacard.vercel.app/](https://avaliacard.vercel.app/)\n\nQual deles você gostaria de conferir primeiro?`,
+      needsHumanHandoff: false,
+    };
+  }
+
+  // 5. WhatsApp / Telefone / Atendimento Humano
   const handoffKeywords = [
     'falar com alguém',
     'falar com alguem',
     'falar com uma pessoa',
+    'falar com especialista',
+    'especialista',
     'atendente',
     'humano',
     'falar com humano',
@@ -171,17 +322,188 @@ function findKnowledgeBaseAnswer(
     'pessoa',
     'atendimento humano',
     'número',
+    'numero',
     'numero de telefone',
+    'número de telefone',
     'telefone',
+    'contato',
+    'qual o whatsapp',
+    'qual o telefone',
+    'whatsapp da empresa',
+    'whatsapp do especialista',
   ];
   if (handoffKeywords.some((k) => q.includes(k))) {
     return {
-      reply: `Com certeza! 🤝 Um de nossos atendentes humanos está à sua disposição.\n\nVocê pode nos chamar direto no WhatsApp pelo número **${cfg.businessPhone}** ou clicar no link abaixo para conversar imediatamente. Horário de atendimento: Segunda a Sexta, das 08h às 18h.`,
+      reply: `Com certeza! Vou te conectar direto com nosso especialista da **Start Mkt Local**.\n\nClique no link para conversar agora no WhatsApp: [WhatsApp Especialista](https://wa.me/5567993174512) ou ligue **${cfg.businessPhone}**.\n\nNosso atendimento funciona de Seg a Sex (08h às 18h) e Sáb (08h às 12h). Como posso adiantar seu atendimento?`,
       needsHumanHandoff: true,
     };
   }
 
-  // 4. Pricing / Quanto custa / Valores
+  // 6. Serviço 1: Criação de Sites (Apenas quando o usuário quer criar/contratar um site para a empresa dele)
+  const siteCreationPhrases = [
+    'criação de sites',
+    'criacao de sites',
+    'criação de site',
+    'criacao de site',
+    'criar site',
+    'criar um site',
+    'fazer site',
+    'fazer um site',
+    'desenvolver site',
+    'desenvolvimento de site',
+    'construir site',
+    'construção de site',
+    'quanto custa um site',
+    'valor do site',
+    'preço do site',
+    'quero um site',
+    'preciso de um site',
+    'vocês fazem site',
+    'voces fazem site',
+    'vocês criam site',
+    'voces criam site',
+    'serviço de site',
+    'servico de site',
+    'landing page',
+  ];
+  if (siteCreationPhrases.some((phrase) => q.includes(phrase)) && !q.includes('bio')) {
+    return {
+      reply: `Nosso serviço de **Criação de Sites** coloca sua empresa em destaque total no meio digital!\n\n• **Prazo de entrega:** Apenas 7 dias\n• **Valor:** A partir de R$ 500,00\n• **Para quem é:** Empresas em geral que desejam presença forte e autoridade na internet.\n\nQuer garantir a criação do site da sua empresa esta semana?`,
+      needsHumanHandoff: false,
+    };
+  }
+
+  // 7. Serviço 3: Biosite com Atendimento Virtual
+  const biositeKeywords = [
+    'biosite',
+    'bio site',
+    'atendimento virtual',
+    'vicente',
+    'vicenteiague',
+    'biosites',
+    'modelo de biosite',
+    'exemplo de biosite',
+  ];
+  if (biositeKeywords.some((k) => q.includes(k))) {
+    return {
+      reply: `O **Biosite com Atendimento Virtual** inclui um biosite moderno e agente de IA 24 horas treinado com todo o conhecimento da sua empresa!\n\n• **Valor:** R$ 167,00 + R$ 50,00/mês de manutenção do Agente de IA\n• **Exemplo Real Funcionando:** [Ver Modelo de Biosite](https://vicenteiaguebiositegoogleia.vercel.app/)\n\nQuer que eu crie um biosite inteligente como esse para sua empresa?`,
+      needsHumanHandoff: false,
+    };
+  }
+
+  // 8. Serviço 6: Avaliacard NFC & QR Code Google
+  const avaliacardKeywords = [
+    'avaliacard',
+    'avalia card',
+    'nfc',
+    'cartao nfc',
+    'cartão nfc',
+    'avaliação do google',
+    'avaliacao do google',
+    'avaliacoes google',
+    'avaliações google',
+    'qr code avaliacao',
+    'cartão de avaliação',
+    'cartao de avaliacao',
+  ];
+  if (avaliacardKeywords.some((k) => q.includes(k))) {
+    return {
+      reply: `O **Avaliacard** é o cartão inteligente com chip NFC e QR Code com link direto na página de avaliação do Google da sua empresa!\n\n• **Valor:** Apenas R$ 89,00 + **Frete Grátis** para todo o Brasil!\n• **Website Oficial do Produto:** [Ver Website Avaliacard](https://avaliacard.vercel.app/)\n\nMultiplique suas avaliações 5 estrelas no Google! Quer receber o seu Avaliacard com frete grátis?`,
+      needsHumanHandoff: false,
+    };
+  }
+
+  // 9. Serviço 2: Gestor Google Meu Negócio
+  const gmnKeywords = [
+    'google meu negócio',
+    'google meu negocio',
+    'meu negócio',
+    'meu negocio',
+    'gestor google',
+    'perfil no google',
+    'google maps',
+    'gmn',
+    'aparecer no google',
+    'ficha do google',
+  ];
+  if (gmnKeywords.some((k) => q.includes(k))) {
+    return {
+      reply: `Com a **Gestão do Google Meu Negócio**, cuidamos da criação, otimização e gestão do perfil da sua empresa para você se destacar nas buscas e no Google Maps!\n\n• **Para quem é:** Empresas de todo o Brasil\n• **Valor:** R$ A combinar (personalizado para seu segmento)\n\nSua empresa já tem cadastro no Google ou deseja criar e ranquear do zero?`,
+      needsHumanHandoff: false,
+    };
+  }
+
+  // 10. Serviço 4: Gestor de Tráfego Meta Ads
+  const metaAdsKeywords = [
+    'meta ads',
+    'tráfego',
+    'trafego',
+    'gestor de tráfego',
+    'gestor de trafego',
+    'anúncios',
+    'anuncios',
+    'facebook ads',
+    'instagram ads',
+    'campanha',
+    'campanhas',
+    'anunciar no instagram',
+    'anunciar no facebook',
+  ];
+  if (metaAdsKeywords.some((k) => q.includes(k))) {
+    return {
+      reply: `Com a **Gestão de Tráfego Meta Ads**, criamos campanhas de marketing de alta conversão no Facebook e Instagram para direcionar clientes qualificados direto para seu WhatsApp!\n\n• **Para quem é:** Empresas de todo o Brasil\n• **Valor:** R$ A combinar conforme o volume da sua campanha\n\nVocê já anuncia atualmente ou quer começar a atrair novos clientes esta semana?`,
+      needsHumanHandoff: false,
+    };
+  }
+
+  // 11. Serviço 5: Criação de Agente de IA no WhatsApp
+  const botKeywords = [
+    'agente de ia',
+    'agente ia',
+    'ia para whatsapp',
+    'ia no whatsapp',
+    'atendimento no whatsapp',
+    'chatbot',
+    'bot whatsapp',
+    'robô de whatsapp',
+    'robo de whatsapp',
+    'atendimento virtual whatsapp',
+    'assistente virtual',
+  ];
+  if (botKeywords.some((k) => q.includes(k))) {
+    return {
+      reply: `Criamos **Agentes de IA no WhatsApp** da sua empresa responsáveis pelo atendimento 24 horas por dia, tirando dúvidas, enviando links clicáveis e convertendo vendas!\n\n• **O que inclui:** Treinamento com conhecimento total da sua empresa\n• **Valor:** R$ A combinar\n\nQuer colocar uma assistente inteligente como eu trabalhando no WhatsApp da sua empresa?`,
+      needsHumanHandoff: false,
+    };
+  }
+
+  // 12. Catálogo Geral de Serviços
+  const servicesKeywords = [
+    'quais são os serviços',
+    'quais sao os servicos',
+    'quais os serviços',
+    'quais os servicos',
+    'serviços',
+    'servicos',
+    'o que vocês fazem',
+    'o que voces fazem',
+    'o que você faz',
+    'o que voce faz',
+    'catálogo',
+    'catalogo',
+    'soluções',
+    'solucoes',
+    'produtos',
+    'quais os produtos',
+  ];
+  if (servicesKeywords.some((k) => q.includes(k))) {
+    return {
+      reply: `A **Start Mkt Local** é uma agência de marketing digital que oferece 6 serviços de alto desempenho para negócios locais em todo o Brasil:\n\n1. 🌐 **Criação de Sites** (a partir de R$ 500, entrega em 7 dias)\n2. 📍 **Gestor Google Meu Negócio** (destaque nas buscas locais)\n3. 📱 **Biosite com Atendimento Virtual IA** (R$ 167 + R$ 50/mês: [Ver Modelo](https://vicenteiaguebiositegoogleia.vercel.app/))\n4. 📈 **Gestor de Tráfego Meta Ads** (anúncios no Instagram/Facebook)\n5. 🤖 **Agente de IA no WhatsApp** (atendimento e vendas 24h)\n6. ⭐ **Avaliacard NFC Google** (R$ 89 com frete grátis: [Ver Website](https://avaliacard.vercel.app/))\n\nQual dessas soluções você gostaria de contratar para seu negócio?`,
+      needsHumanHandoff: false,
+    };
+  }
+
+  // 13. Tabela de Preços / Quanto custa
   const priceKeywords = [
     'quanto custa',
     'preço',
@@ -195,80 +517,65 @@ function findKnowledgeBaseAnswer(
     'quanto sai',
     'quanto é',
     'quanto e',
+    'orçamento',
+    'orcamento',
   ];
   if (priceKeywords.some((k) => q.includes(k))) {
     return {
-      reply: `Nossos valores são super transparentes e acessíveis! 💳✨\n\n• **Cartão NFC Individual PVC**: **R$ 79,90** (pagamento único, sem mensalidade e com frete grátis).\n• **Cartão NFC Metal Executive**: **R$ 149,90** (acabamento metálico gravado a laser).\n• **Plano Corporate (a partir de 5 unidades)**: **R$ 59,90/unidade** com painel de gestão corporativa.\n• **Linha Superlimpo**: Kits profissionais de saneantes e desinfetantes a partir de **R$ 89,00**.\n\nQual dessas opções você gostaria de encomendar?`,
+      reply: `Aqui estão os valores dos serviços da **Start Mkt Local**:\n\n• **Criação de Sites:** A partir de R$ 500,00 (entrega em 7 dias)\n• **Biosite com Atendimento Virtual IA:** R$ 167,00 + R$ 50,00/mês de manutenção\n• **Avaliacard Cartão NFC Google:** R$ 89,00 com Frete Grátis\n• **Google Meu Negócio, Meta Ads e Agente IA:** Valores personalizados a combinar\n\nNo PIX você ganha **5% de desconto imediato**, ou parcelamos no cartão em até 3x sem juros! Qual desses serviços se encaixa melhor no seu orçamento?`,
       needsHumanHandoff: false,
     };
   }
 
-  // 5. How NFC works / O que é NFC / Cartão
-  const nfcKeywords = [
-    'como funciona',
-    'nfc',
-    'aproximação',
-    'aproximacao',
-    'chip',
-    'cartao nfc',
-    'cartão nfc',
-    'como usa',
-    'como usar',
-    'o que e nfc',
-    'o que é nfc',
+  // 14. Desconto PIX / Condição Especial
+  const discountKeywords = [
+    'desconto',
+    'fechar hoje',
+    'condição especial',
+    'condicao especial',
+    'tem desconto',
+    'mais barato',
+    'faz um desconto',
   ];
-  if (nfcKeywords.some((k) => q.includes(k))) {
+  if (discountKeywords.some((k) => q.includes(k))) {
     return {
-      reply: `O **Cartão NFC Conectacard** funciona de forma rápida e inovadora por aproximação! 🚀\n\n1. 📱 **Basta aproximar**: Encoste o cartão na traseira de qualquer smartphone moderno (iPhone ou Android).\n2. 🌐 **Sem aplicativo**: O perfil abre direto no navegador do cliente na hora, sem precisar baixar nada!\n3. ⚡ **Tudo em um só lugar**: Compartilhe WhatsApp direto, Instagram, LinkedIn, chave PIX, catálogo de produtos e site.\n4. 🔄 **Atualizável**: Altere seus dados na nuvem a qualquer momento sem trocar de cartão.\n5. 📷 **QR Code integrado**: Celulares mais antigos podem ler o QR Code no verso.\n\nDeseja personalizar um com a logo da sua marca?`,
+      reply: `No pagamento via PIX já aplicamos **5% de desconto imediato**! Se você quiser fechar um pacote com mais de um serviço, posso chamar nosso especialista no WhatsApp para liberar uma condição especial para você: [Falar no WhatsApp](https://wa.me/5567993174512).\n\nQual serviço você gostaria de fechar hoje com desconto?`,
       needsHumanHandoff: false,
     };
   }
 
-  // 6. Superlimpo / Products / Catalog
-  const superlimpoKeywords = [
-    'superlimpo',
-    'produto',
-    'produtos',
-    'limpeza',
-    'saneante',
-    'saneantes',
-    'desinfetante',
-    'catálogo',
-    'catalogo',
-    'detergente',
-  ];
-  if (superlimpoKeywords.some((k) => q.includes(k))) {
+  // 15. Garantia
+  const guaranteeKeywords = ['garantia', 'tem garantia', 'qual a garantia', 'seguro'];
+  if (guaranteeKeywords.some((k) => q.includes(k))) {
     return {
-      reply: `A **Superlimpo** é especializada em soluções profissionais de higienização e saneantes de alto rendimento! 🧴✨\n\n• **Linha de Produtos**: Desinfetantes concentrados, detergentes enzimáticos, neutralizadores de odores, panos de microfibra de alta densidade e dispensadores automáticos.\n• 🌐 **Site Oficial**: ${cfg.websiteSuperlimpo}\n• 📦 **Catálogo Completo**: ${cfg.catalogUrl}\n\nGostaria de solicitar uma cotação para sua empresa ou residência?`,
+      reply: `Você tem **15 dias de garantia total**! Se tiver qualquer problema, resolvemos sem burocracia.\n\nQuer iniciar seu projeto com total segurança e garantia?`,
       needsHumanHandoff: false,
     };
   }
 
-  // 7. General Services / Quais são os serviços
-  const servicesKeywords = [
-    'quais são os serviços',
-    'quais sao os servicos',
-    'serviços',
-    'servicos',
-    'o que vocês fazem',
-    'o que voces fazem',
-    'o que você faz',
-    'o que voce faz',
-    'soluções',
-    'solucoes',
-  ];
-  if (servicesKeywords.some((k) => q.includes(k))) {
+  // 16. Objeção Preço / Vou pensar
+  const objectionKeywords = ['achei alto', 'achei caro', 'vou pensar', 'muito caro', 'pensar', 'valor alto'];
+  if (objectionKeywords.some((k) => q.includes(k))) {
     return {
-      reply: `Olá! 👋 Nós oferecemos duas frentes de excelência para seu negócio:\n\n1. 📱 **Conectacard (Tecnologia & Networking)**: Cartões de visita inteligentes com chip NFC e QR Code integrado para você compartilhar contatos, redes sociais, WhatsApp e chave PIX por aproximação no celular.\n2. 🧼 **Superlimpo (Saneantes Profissionais)**: Linha de alta performance para higienização de empresas, condomínios e residências (${cfg.websiteSuperlimpo}).\n\nQual dessas soluções você gostaria de conhecer melhor?`,
+      reply: `Entendo perfeitamente! Mas vale lembrar que todos os nossos serviços são de alto desempenho para alavancar Negócios Locais, o que economiza tempo e gera mais vendas para você.\n\nQuer que eu te mostre a opção de parcelamento em até 3x sem juros para caber tranquilo no seu orçamento?`,
       needsHumanHandoff: false,
     };
   }
 
-  // 8. Website / Site
-  const websiteKeywords = ['site', 'qual o site', 'link', 'pagina', 'página', 'onde acessar'];
-  if (websiteKeywords.some((k) => q.includes(k))) {
+  // 17. Formas de Pagamento
+  const paymentKeywords = ['forma de pagamento', 'formas de pagamento', 'como pagar', 'parcela', 'parcelamento', 'cartão', 'cartao', 'pix', 'débito', 'debito'];
+  if (paymentKeywords.some((k) => q.includes(k))) {
     return {
-      reply: `Aqui estão nossos canais e sites oficiais! 🌐\n\n• **Conectacard**: ${cfg.websiteConectacard}\n• **Superlimpo**: ${cfg.websiteSuperlimpo}\n• **Catálogo de Produtos**: ${cfg.catalogUrl}\n\nVocê também pode falar com a nossa equipe no WhatsApp: **${cfg.businessPhone}**.`,
+      reply: `Aceitamos **PIX (com 5% de desconto imediato!)**, **Cartão de Crédito em até 3x sem juros** e **Cartão de Débito**.\n\nQual dessas formas de pagamento você prefere?`,
+      needsHumanHandoff: false,
+    };
+  }
+
+  // 18. Localização e Horário de Funcionamento
+  const locationKeywords = ['onde fica', 'onde vocês ficam', 'onde voces ficam', 'localização', 'localizacao', 'endereço', 'endereco', 'horário', 'horario', 'ponta porã', 'ponta pora', 'qual a cidade', 'cidade'];
+  if (locationKeywords.some((k) => q.includes(k))) {
+    return {
+      reply: `Estamos sediados em **Ponta Porã - MS** e atendemos clientes em todo o Brasil!\n\nNosso horário de funcionamento é de Segunda a Sexta, das 08h às 18h e Sábado, das 08h às 12h.\n\nComo a Start Mkt Local pode ajudar a sua empresa hoje?`,
       needsHumanHandoff: false,
     };
   }
@@ -276,12 +583,13 @@ function findKnowledgeBaseAnswer(
   return null;
 }
 
-// Fallback response generator if Gemini key is invalid/unavailable
+// Fallback response generator according to Golden Rules
 function getFallbackResponse(query: string): string {
   const kbMatch = findKnowledgeBaseAnswer(query, config);
   if (kbMatch) return kbMatch.reply;
 
-  return `Olá! Eu sou a ${config.botName}, assistente virtual inteligente da ${config.companyName}. Estou pronta para tirar dúvidas sobre nossos cartões NFC inteligentes, catálogo de produtos Superlimpo e serviços. Como posso ajudar você hoje? Pode perguntar! 😊`;
+  // Golden Rule 1: Fidelidade aos dados - se perguntar algo fora do documento
+  return `Para te confirmar esse detalhe específico sem erro, vou te passar o contato direto do nosso especialista: [Link de Contato/WhatsApp: https://wa.me/5567993174512].\n\nPosso te adiantar informações sobre Criação de Sites, Biosites com IA, Avaliacard, Google Meu Negócio ou Gestão de Tráfego?`;
 }
 
 // Check if human handoff should be triggered
@@ -369,18 +677,18 @@ apiRouter.post('/chat', async (req, res) => {
 
     // Race Gemini against a 2800ms timeout to guarantee instant responsiveness
     const geminiCall = ai.models.generateContent({
-      model: 'gemini-3.1-flash-lite',
+      model: 'gemini-3.8-flash',
       contents: contents,
       config: {
         systemInstruction: systemInstruction,
         thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL },
-        maxOutputTokens: 250,
-        temperature: 0.5,
+        maxOutputTokens: 300,
+        temperature: 0.4,
       },
     });
 
     const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('GEMINI_TIMEOUT')), 2800)
+      setTimeout(() => reject(new Error('GEMINI_TIMEOUT')), 5000)
     );
 
     const response = await Promise.race([geminiCall, timeoutPromise]);
@@ -417,7 +725,7 @@ apiRouter.post('/chat-audio', async (req, res) => {
 
   try {
     if (!process.env.GEMINI_API_KEY) {
-      const fallbackTranscription = 'Gostaria de saber mais sobre os cartões da Conectacard e produtos Superlimpo';
+      const fallbackTranscription = 'Gostaria de saber mais sobre criação de sites e biosite com IA da Start Mkt Local';
       const fallbackReply = getFallbackResponse(fallbackTranscription);
       return res.json({
         transcription: fallbackTranscription,
@@ -446,7 +754,7 @@ Responda estritamente em formato JSON com as chaves:
 }`;
 
     const geminiAudioCall = ai.models.generateContent({
-      model: 'gemini-3.1-flash-lite',
+      model: 'gemini-3.8-flash',
       contents: [audioPart, { text: promptText }],
       config: {
         systemInstruction: buildSystemPrompt(),
@@ -579,7 +887,7 @@ apiRouter.post('/webhook/whatsapp', async (req, res) => {
     const value = changes?.value;
     const messageObj = value?.messages?.[0];
 
-    const senderPhone = messageObj?.from || req.body?.senderPhone || '5567993174612';
+    const senderPhone = messageObj?.from || req.body?.senderPhone || '5567993174512';
     const msgType = messageObj?.type || (req.body?.isAudio ? 'audio' : 'text');
     let messageText = messageObj?.text?.body || req.body?.message || '';
 
