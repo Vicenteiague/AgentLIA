@@ -1,0 +1,6 @@
+{
+  "name": "LIA - Chatbot IA WhatsApp Business",
+  "description": "Assistente virtual inteligente integrada com Google Gemini e WhatsApp Business para respostas automáticas de consultas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
