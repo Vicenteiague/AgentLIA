@@ -496,6 +496,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   {msg.role === 'assistant' && (
                     <AudioPlayer
                       theme={theme}
+                      text={msg.text}
                       audioUrl={msg.audioUrl}
                       onGenerateAudio={async () => {
                         const url = await fetchAudioTts(msg.text);

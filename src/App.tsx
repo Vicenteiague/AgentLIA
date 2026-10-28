@@ -11,6 +11,7 @@ import {
   Sun,
   Moon,
   Share2,
+  Calendar,
 } from 'lucide-react';
 import { BusinessConfig, fetchBusinessConfig } from './services/api';
 import { ChatInterface } from './components/ChatInterface';
@@ -18,9 +19,10 @@ import { WhatsAppSimulator } from './components/WhatsAppSimulator';
 import { IntegrationHub } from './components/IntegrationHub';
 import { KnowledgeBaseModal } from './components/KnowledgeBaseModal';
 import { ShareTestModal } from './components/ShareTestModal';
+import { GoogleWorkspacePanel } from './components/GoogleWorkspacePanel';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'chat' | 'simulator' | 'integration'>('chat');
+  const [activeTab, setActiveTab] = useState<'chat' | 'simulator' | 'integration' | 'google'>('chat');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [theme, setTheme] = useState<'day' | 'night'>(() => {
@@ -92,6 +94,8 @@ export default function App() {
         setActiveTab('simulator');
       } else if (tabParam === 'integration' || tabParam === 'api') {
         setActiveTab('integration');
+      } else if (tabParam === 'google' || tabParam === 'calendar' || tabParam === 'sheets') {
+        setActiveTab('google');
       } else if (tabParam === 'chat') {
         setActiveTab('chat');
       }
@@ -225,13 +229,13 @@ export default function App() {
 
           {/* Navigation Tabs (Full width grid on mobile, inline on desktop) */}
           <div
-            className={`w-full md:w-auto grid grid-cols-3 md:flex items-center p-1 rounded-2xl border transition-colors shrink-0 ${
+            className={`w-full md:w-auto grid grid-cols-4 md:flex items-center p-1 rounded-2xl border transition-colors shrink-0 ${
               isDay ? 'bg-slate-100 border-slate-200' : 'bg-[#1c1e2b] border-slate-800'
             }`}
           >
             <button
               onClick={() => setActiveTab('chat')}
-              className={`flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer text-center ${
+              className={`flex items-center justify-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer text-center ${
                 activeTab === 'chat'
                   ? 'bg-emerald-500 text-slate-950 shadow-sm'
                   : isDay
@@ -245,7 +249,7 @@ export default function App() {
 
             <button
               onClick={() => setActiveTab('simulator')}
-              className={`flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer text-center ${
+              className={`flex items-center justify-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer text-center ${
                 activeTab === 'simulator'
                   ? 'bg-emerald-500 text-slate-950 shadow-sm'
                   : isDay
@@ -258,8 +262,22 @@ export default function App() {
             </button>
 
             <button
+              onClick={() => setActiveTab('google')}
+              className={`flex items-center justify-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer text-center ${
+                activeTab === 'google'
+                  ? 'bg-blue-500 text-white shadow-sm'
+                  : isDay
+                  ? 'text-slate-600 hover:text-slate-900'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Calendar className="w-3.5 h-3.5 shrink-0 text-blue-400" />
+              <span className="truncate">Google</span>
+            </button>
+
+            <button
               onClick={() => setActiveTab('integration')}
-              className={`flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer text-center ${
+              className={`flex items-center justify-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer text-center ${
                 activeTab === 'integration'
                   ? 'bg-emerald-500 text-slate-950 shadow-sm'
                   : isDay
@@ -375,6 +393,10 @@ export default function App() {
           </div>
         )}
 
+        {activeTab === 'google' && (
+          <GoogleWorkspacePanel config={config} theme={theme} />
+        )}
+
         {activeTab === 'integration' && (
           <IntegrationHub
             config={config}
@@ -417,6 +439,12 @@ export default function App() {
             >
               <Share2 className="w-3 h-3" />
               <span>Link para Clientes</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('google')}
+              className={`transition font-medium ${isDay ? 'hover:text-blue-600 text-blue-700' : 'hover:text-blue-300 text-blue-400'}`}
+            >
+              Google Workspace
             </button>
             <button
               onClick={() => setActiveTab('integration')}

@@ -113,8 +113,15 @@ R: Entendo perfeitamente! Mas vale lembrar que todos os nossos produtos são de 
 
 # 6. REGRAS DE OURO (Guardrails)
 1. **Fidelidade aos Dados:** Responda APENAS com base nas informações acima. Se o cliente perguntar algo que não está neste documento, diga exatamente: "Para te confirmar esse detalhe específico sem erro, vou te passar o contato direto do nosso especialista: [- **Link de Contato/WhatsApp:** https://wa.me/5567993174512]".
-2. **Proibido Inventar:** Nunca invente preços, prazos, promoções ou serviços que não estejam na seção 3.
-3. **Formatação:** Nunca envie blocos gigantes de texto. Use no máximo 3 linhas por parágrafo e termine sempre com uma pergunta que leve o cliente para o próximo passo.`;
+2. **Proibido Inventar:** Nunca invente preços, prazos, promoções ou serviços que não estejam na seção 3 e 7.
+3. **Formatação:** Nunca envie blocos gigantes de texto. Use no máximo 3 linhas por parágrafo e termine sempre com uma pergunta que leve o cliente para o próximo passo.
+
+---
+
+# 7. INTEGRAÇÕES GOOGLE (Agenda, Planilhas e Meu Negócio)
+- **Google Agenda (Calendar):** Conectamos e agendamos consultas/reuniões de apresentação de serviços diretamente na Google Agenda. Você pode agendar na aba Google do app ou pelo WhatsApp [https://wa.me/5567993174512](https://wa.me/5567993174512).
+- **Google Sheets (Planilhas):** Gravamos e sincronizamos os leads e contatos recebidos automaticamente em planilhas do Google Drive.
+- **Google Meu Negócio & AvaliaCard:** Gerenciamos seu perfil no Google Meu Negócio e fornecemos o **AvaliaCard NFC** ([https://avaliacard.vercel.app/](https://avaliacard.vercel.app/)) por R$ 89,00 + frete grátis, para os clientes avaliarem sua empresa com 5 estrelas por aproximação no balcão.`;
 
 const DEFAULT_CONFIG: BusinessConfig = {
   companyName: 'Start Mkt Local',
@@ -263,8 +270,8 @@ export async function sendChatAudio(
   } catch (err) {
     console.warn('Erro ao processar áudio no servidor, gerando fallback:', err);
     return {
-      transcription: 'Mensagem de voz sobre cartões e produtos',
-      reply: 'Olá! Ouvi sua mensagem de áudio. Sobre os Cartões NFC Conectacard, eles custam a partir de R$ 79,90 com frete grátis e funcionam por aproximação sem app! E sobre a Superlimpo, temos linha profissional completa. Como posso te ajudar a fechar seu pedido?',
+      transcription: 'Gostaria de saber os valores para Criação de Sites e Biosite com IA',
+      reply: 'Olá! Ouvi seu áudio com atenção. Para **Criação de Sites**, trabalhamos a partir de R$ 500,00 com entrega em 7 dias! E o **Biosite com Atendimento Virtual IA 24h** custa R$ 167,00 + R$ 50,00/mês de manutenção. Quer que eu te envie o modelo de biosite funcionando para você testar?',
       needsHumanHandoff: false,
       isFallback: true,
     };

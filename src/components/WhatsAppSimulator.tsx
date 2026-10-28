@@ -16,9 +16,11 @@ import {
   Pause,
   RotateCcw,
   Share2,
+  Trash2,
 } from 'lucide-react';
-import { BusinessConfig, ChatMessage, sendChatMessage } from '../services/api';
+import { BusinessConfig, ChatMessage, sendChatMessage, fetchAudioTts, sendChatAudio } from '../services/api';
 import { VoiceNoteBubble } from './VoiceNoteBubble';
+import { AudioPlayer } from './AudioPlayer';
 import { FormattedMessageText } from './FormattedMessageText';
 import { createSampleVoiceAudioUrl } from '../utils/audioHelper';
 
@@ -67,79 +69,121 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
     };
   }, []);
 
-  const toggleSpeechRecognition = () => {
-    if (typeof window === 'undefined') return;
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+  const [isRecordingAudio, setIsRecordingAudio] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<any>(null);
 
-    if (!SpeechRecognition) {
-      alert('Reconhecimento de voz não suportado neste navegador.');
-      return;
-    }
-
-    if (isListeningRef.current) {
-      isListeningRef.current = false;
-      setIsListening(false);
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.stop();
-        } catch {
-          try {
-            recognitionRef.current.abort();
-          } catch {
-            // Ignore
-          }
-        }
-      }
-      return;
-    }
-
-    if (recognitionRef.current) {
+  const startVoiceRecording = async () => {
+    if (typeof navigator !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try {
-        recognitionRef.current.abort();
-      } catch {
-        // Ignore
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioChunksRef.current = [];
+        const mediaRecorder = new MediaRecorder(stream);
+        mediaRecorderRef.current = mediaRecorder;
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            audioChunksRef.current.push(event.data);
+          }
+        };
+
+        mediaRecorder.onstop = () => {
+          stream.getTracks().forEach((track) => track.stop());
+          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+          const audioUrl = URL.createObjectURL(audioBlob);
+
+          const reader = new FileReader();
+          reader.onloadend = async () => {
+            const base64Data = reader.result as string;
+            await handleSendRecordedAudio(audioUrl, base64Data);
+          };
+          reader.readAsDataURL(audioBlob);
+        };
+
+        mediaRecorder.start();
+        setIsRecordingAudio(true);
+        setRecordingSeconds(0);
+        timerRef.current = setInterval(() => {
+          setRecordingSeconds((prev) => prev + 1);
+        }, 1000);
+        return;
+      } catch (err: any) {
+        console.warn('Microfone nativo inacessível no navegador:', err);
       }
-      recognitionRef.current = null;
     }
+
+    // Se microfone nativo for bloqueado pelo navegador/celular, envia simulação com player
+    handleSendAudioSample();
+  };
+
+  const cancelVoiceRecording = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.ondataavailable = null;
+      mediaRecorderRef.current.onstop = null;
+      try {
+        mediaRecorderRef.current.stop();
+      } catch {}
+    }
+    setIsRecordingAudio(false);
+    setRecordingSeconds(0);
+  };
+
+  const stopAndSendVoiceRecording = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      try {
+        mediaRecorderRef.current.stop();
+      } catch {}
+    }
+    setIsRecordingAudio(false);
+    setRecordingSeconds(0);
+  };
+
+  const handleSendRecordedAudio = async (audioUrl: string, base64Data: string) => {
+    const timeStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const userAudioMsg: ChatMessage = {
+      id: `wa-voice-${Date.now()}`,
+      role: 'user',
+      text: 'Mensagem de voz enviada',
+      timestamp: timeStr,
+      isVoiceNote: true,
+      audioUrl: audioUrl,
+      transcription: 'Interpretando áudio pelo Gemini...',
+      status: 'sent',
+    };
+
+    setMessages((prev) => [...prev, userAudioMsg]);
+    setIsLoading(true);
 
     try {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = 'pt-BR';
+      const history = messages.slice(-6).map((m) => ({
+        role: m.role as 'user' | 'assistant',
+        text: m.text,
+      }));
 
-      recognition.onstart = () => {
-        isListeningRef.current = true;
-        setIsListening(true);
+      const res = await sendChatAudio(base64Data, 'audio/webm', history);
+      userAudioMsg.transcription = res.transcription;
+
+      const liaAudioUrl = await fetchAudioTts(res.reply).catch(() => '');
+
+      const botMsg: ChatMessage = {
+        id: `wa-b-${Date.now()}`,
+        role: 'assistant',
+        text: res.reply,
+        timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+        needsHumanHandoff: res.needsHumanHandoff,
+        audioUrl: liaAudioUrl,
+        status: 'read',
       };
 
-      recognition.onresult = (event: any) => {
-        const transcript = event.results?.[0]?.[0]?.transcript;
-        if (transcript) {
-          setInput((prev) => (prev.trim() ? `${prev.trim()} ${transcript}` : transcript));
-        }
-      };
-
-      recognition.onerror = (event: any) => {
-        if (event.error !== 'no-speech' && event.error !== 'aborted') {
-          console.warn('SpeechRecognition error:', event.error);
-        }
-        isListeningRef.current = false;
-        setIsListening(false);
-      };
-
-      recognition.onend = () => {
-        isListeningRef.current = false;
-        setIsListening(false);
-      };
-
-      recognitionRef.current = recognition;
-      recognition.start();
-    } catch (err: any) {
-      console.warn('Speech start error:', err);
-      isListeningRef.current = false;
-      setIsListening(false);
+      setMessages((prev) => [...prev, botMsg]);
+    } catch (err) {
+      console.error('Erro áudio simulator:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -406,6 +450,21 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
                     variant="whatsapp"
                   />
 
+                  {/* Audio Player for LIA's voice in WhatsApp */}
+                  {m.role === 'assistant' && (
+                    <AudioPlayer
+                      theme={theme}
+                      variant="whatsapp"
+                      text={m.text}
+                      audioUrl={m.audioUrl}
+                      onGenerateAudio={async () => {
+                        const url = await fetchAudioTts(m.text);
+                        m.audioUrl = url;
+                        return url;
+                      }}
+                    />
+                  )}
+
                 {/* Human handoff card in WhatsApp */}
                 {m.needsHumanHandoff && (
                   <div
@@ -470,60 +529,85 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
             isDay ? 'bg-[#f0f2f5]' : 'bg-[#202c33]'
           }`}
         >
-          <button
-            type="button"
-            className={`p-1 ${isDay ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200'}`}
-          >
-            <Smile className="w-5 h-5" />
-          </button>
-          <button
-            type="button"
-            className={`p-1 ${isDay ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200'}`}
-          >
-            <Paperclip className="w-5 h-5" />
-          </button>
-
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSend();
-            }}
-            className="flex-1 flex items-center"
-          >
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Mensagem"
-              className={`w-full text-sm px-3 py-2 rounded-lg border-none focus:outline-none shadow-2xs ${
-                isDay
-                  ? 'bg-white text-slate-900 placeholder-slate-400'
-                  : 'bg-[#2a3942] text-slate-100 placeholder-slate-400'
-              }`}
-            />
-          </form>
-
-          {input.trim() ? (
-            <button
-              onClick={() => handleSend()}
-              type="button"
-              className="w-9 h-9 rounded-full bg-[#00a884] text-white flex items-center justify-center hover:bg-[#008f6f] transition active:scale-95 shadow cursor-pointer"
-            >
-              <Send className="w-4 h-4 ml-0.5" />
-            </button>
+          {isRecordingAudio ? (
+            <div className="flex-1 flex items-center justify-between px-2 py-1">
+              <div className="flex items-center gap-2 text-rose-500 font-semibold text-xs animate-pulse">
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                <span>Gravando áudio: {Math.floor(recordingSeconds / 60)}:{recordingSeconds % 60 < 10 ? '0' : ''}{recordingSeconds % 60}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={cancelVoiceRecording}
+                  type="button"
+                  className="p-1.5 text-slate-400 hover:text-rose-500 transition active:scale-95"
+                  title="Cancelar gravação"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={stopAndSendVoiceRecording}
+                  type="button"
+                  className="w-8 h-8 rounded-full bg-[#00a884] hover:bg-[#008f6f] text-white flex items-center justify-center transition active:scale-95 shadow cursor-pointer"
+                  title="Enviar áudio"
+                >
+                  <Send className="w-3.5 h-3.5 ml-0.5" />
+                </button>
+              </div>
+            </div>
           ) : (
-            <button
-              onClick={toggleSpeechRecognition}
-              type="button"
-              className={`w-9 h-9 rounded-full flex items-center justify-center transition active:scale-95 shadow cursor-pointer ${
-                isListening
-                  ? 'bg-rose-500 text-white animate-pulse'
-                  : 'bg-[#00a884] text-white hover:bg-[#008f6f]'
-              }`}
-              title={isListening ? 'Parar gravação' : 'Falar por voz'}
-            >
-              {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-            </button>
+            <>
+              <button
+                type="button"
+                className={`p-1 ${isDay ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200'}`}
+              >
+                <Smile className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                className={`p-1 ${isDay ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200'}`}
+              >
+                <Paperclip className="w-5 h-5" />
+              </button>
+
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSend();
+                }}
+                className="flex-1 flex items-center"
+              >
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Mensagem"
+                  className={`w-full text-sm px-3 py-2 rounded-lg border-none focus:outline-none shadow-2xs ${
+                    isDay
+                      ? 'bg-white text-slate-900 placeholder-slate-400'
+                      : 'bg-[#2a3942] text-slate-100 placeholder-slate-400'
+                  }`}
+                />
+              </form>
+
+              {input.trim() ? (
+                <button
+                  onClick={() => handleSend()}
+                  type="button"
+                  className="w-9 h-9 rounded-full bg-[#00a884] text-white flex items-center justify-center hover:bg-[#008f6f] transition active:scale-95 shadow cursor-pointer"
+                >
+                  <Send className="w-4 h-4 ml-0.5" />
+                </button>
+              ) : (
+                <button
+                  onClick={startVoiceRecording}
+                  type="button"
+                  className="w-9 h-9 rounded-full bg-[#00a884] text-white hover:bg-[#008f6f] flex items-center justify-center transition active:scale-95 shadow cursor-pointer"
+                  title="Gravar áudio de voz"
+                >
+                  <Mic className="w-4 h-4" />
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>
