@@ -17,6 +17,8 @@ import {
   RotateCcw,
   Share2,
   Trash2,
+  AlertCircle,
+  X,
 } from 'lucide-react';
 import { BusinessConfig, ChatMessage, sendChatMessage, fetchAudioTts, sendChatAudio } from '../services/api';
 import { VoiceNoteBubble } from './VoiceNoteBubble';
@@ -71,51 +73,97 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
 
   const [isRecordingAudio, setIsRecordingAudio] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [micErrorNotice, setMicErrorNotice] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<any>(null);
 
+  const getBestMimeType = (): string => {
+    if (typeof MediaRecorder === 'undefined') return 'audio/webm';
+    const candidates = [
+      'audio/webm;codecs=opus',
+      'audio/webm',
+      'audio/mp4',
+      'audio/ogg;codecs=opus',
+      'audio/ogg',
+      'audio/wav',
+    ];
+    for (const mime of candidates) {
+      if (MediaRecorder.isTypeSupported(mime)) return mime;
+    }
+    return '';
+  };
+
   const startVoiceRecording = async () => {
-    if (typeof navigator !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        audioChunksRef.current = [];
-        const mediaRecorder = new MediaRecorder(stream);
-        mediaRecorderRef.current = mediaRecorder;
+    setMicErrorNotice(null);
 
-        mediaRecorder.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            audioChunksRef.current.push(event.data);
-          }
-        };
-
-        mediaRecorder.onstop = () => {
-          stream.getTracks().forEach((track) => track.stop());
-          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-          const audioUrl = URL.createObjectURL(audioBlob);
-
-          const reader = new FileReader();
-          reader.onloadend = async () => {
-            const base64Data = reader.result as string;
-            await handleSendRecordedAudio(audioUrl, base64Data);
-          };
-          reader.readAsDataURL(audioBlob);
-        };
-
-        mediaRecorder.start();
-        setIsRecordingAudio(true);
-        setRecordingSeconds(0);
-        timerRef.current = setInterval(() => {
-          setRecordingSeconds((prev) => prev + 1);
-        }, 1000);
-        return;
-      } catch (err: any) {
-        console.warn('Microfone nativo inacessível no navegador:', err);
-      }
+    // Verify browser support
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setMicErrorNotice('Seu navegador não oferece suporte à captura de áudio direto.');
+      return;
     }
 
-    // Se microfone nativo for bloqueado pelo navegador/celular, envia simulação com player
-    handleSendAudioSample();
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
+
+      audioChunksRef.current = [];
+      const chosenMime = getBestMimeType();
+      const options = chosenMime ? { mimeType: chosenMime } : undefined;
+      const mediaRecorder = options ? new MediaRecorder(stream, options) : new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        stream.getTracks().forEach((track) => track.stop());
+        const actualMime = mediaRecorder.mimeType || chosenMime || 'audio/webm';
+        const audioBlob = new Blob(audioChunksRef.current, { type: actualMime });
+        const audioUrl = URL.createObjectURL(audioBlob);
+
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const base64Data = reader.result as string;
+          await handleSendRecordedAudio(audioUrl, base64Data, actualMime);
+        };
+        reader.readAsDataURL(audioBlob);
+      };
+
+      // Collect data chunks every 250ms
+      mediaRecorder.start(250);
+      setIsRecordingAudio(true);
+      setRecordingSeconds(0);
+      timerRef.current = setInterval(() => {
+        setRecordingSeconds((prev) => prev + 1);
+      }, 1000);
+    } catch (err: any) {
+      console.warn('Erro ao acessar microfone:', err);
+      const isPermission =
+        err.name === 'NotAllowedError' ||
+        err.name === 'PermissionDeniedError' ||
+        err.name === 'SecurityError' ||
+        err.message?.toLowerCase().includes('permission') ||
+        err.message?.toLowerCase().includes('not allowed');
+
+      if (isPermission) {
+        setMicErrorNotice(
+          'Permissão de microfone negada. Toque no ícone de permissões/cadeado da barra de endereço para permitir o microfone.'
+        );
+      } else {
+        setMicErrorNotice(
+          'Não foi possível iniciar o microfone no seu aparelho. Verifique se outro app está usando o microfone.'
+        );
+      }
+    }
   };
 
   const cancelVoiceRecording = () => {
@@ -142,7 +190,11 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
     setRecordingSeconds(0);
   };
 
-  const handleSendRecordedAudio = async (audioUrl: string, base64Data: string) => {
+  const handleSendRecordedAudio = async (
+    audioUrl: string,
+    base64Data: string,
+    mimeType = 'audio/webm'
+  ) => {
     const timeStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     const userAudioMsg: ChatMessage = {
       id: `wa-voice-${Date.now()}`,
@@ -164,7 +216,7 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
         text: m.text,
       }));
 
-      const res = await sendChatAudio(base64Data, 'audio/webm', history);
+      const res = await sendChatAudio(base64Data, mimeType, history);
       userAudioMsg.transcription = res.transcription;
 
       const liaAudioUrl = await fetchAudioTts(res.reply).catch(() => '');
@@ -522,6 +574,33 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
 
           <div ref={endRef} />
         </div>
+
+        {/* Mic Permission Warning Notice if blocked */}
+        {micErrorNotice && (
+          <div className="mx-2 mb-2 p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs flex flex-col gap-1.5 animate-in fade-in duration-200">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-start gap-1.5 font-medium leading-tight">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
+                <span>{micErrorNotice}</span>
+              </div>
+              <button
+                onClick={() => setMicErrorNotice(null)}
+                className="text-slate-400 hover:text-white p-0.5"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <button
+              onClick={() => {
+                setMicErrorNotice(null);
+                handleSendAudioSample();
+              }}
+              className="self-start text-[11px] font-bold px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 transition"
+            >
+              Testar com Áudio de Demonstração
+            </button>
+          </div>
+        )}
 
         {/* WhatsApp Input Bar */}
         <div

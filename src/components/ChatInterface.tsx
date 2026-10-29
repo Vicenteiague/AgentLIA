@@ -12,6 +12,9 @@ import {
   ExternalLink,
   Bot,
   Share2,
+  Trash2,
+  AlertCircle,
+  X,
 } from 'lucide-react';
 import { BusinessConfig, ChatMessage, sendChatMessage, sendChatAudio, fetchAudioTts } from '../services/api';
 import { AudioPlayer } from './AudioPlayer';
@@ -70,81 +73,172 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     };
   }, []);
 
-  const toggleSpeechRecognition = () => {
-    if (typeof window === 'undefined') return;
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+  // Voice recording state
+  const [isRecordingAudio, setIsRecordingAudio] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [micErrorNotice, setMicErrorNotice] = useState<string | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<any>(null);
 
-    if (!SpeechRecognition) {
-      alert('Reconhecimento de voz não suportado neste navegador.');
-      return;
+  const getBestMimeType = (): string => {
+    if (typeof MediaRecorder === 'undefined') return 'audio/webm';
+    const candidates = [
+      'audio/webm;codecs=opus',
+      'audio/webm',
+      'audio/mp4',
+      'audio/ogg;codecs=opus',
+      'audio/ogg',
+      'audio/wav',
+    ];
+    for (const mime of candidates) {
+      if (MediaRecorder.isTypeSupported(mime)) return mime;
     }
+    return '';
+  };
 
-    // If currently listening, stop immediately
-    if (isListeningRef.current) {
-      isListeningRef.current = false;
-      setIsListening(false);
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.stop();
-        } catch {
-          try {
-            recognitionRef.current.abort();
-          } catch {
-            // Ignore
-          }
-        }
-      }
+  const startVoiceRecording = async () => {
+    setMicErrorNotice(null);
+
+    // Verify browser support
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setMicErrorNotice('Seu navegador não oferece suporte à captura de áudio direto.');
       return;
-    }
-
-    // Stop and clean up any previous instance before creating a new one
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.abort();
-      } catch {
-        // Ignore
-      }
-      recognitionRef.current = null;
     }
 
     try {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = 'pt-BR';
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
 
-      recognition.onstart = () => {
-        isListeningRef.current = true;
-        setIsListening(true);
-      };
+      audioChunksRef.current = [];
+      const chosenMime = getBestMimeType();
+      const options = chosenMime ? { mimeType: chosenMime } : undefined;
+      const mediaRecorder = options ? new MediaRecorder(stream, options) : new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
 
-      recognition.onresult = (event: any) => {
-        const transcript = event.results?.[0]?.[0]?.transcript;
-        if (transcript) {
-          setInput((prev) => (prev.trim() ? `${prev.trim()} ${transcript}` : transcript));
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
         }
       };
 
-      recognition.onerror = (event: any) => {
-        if (event.error !== 'no-speech' && event.error !== 'aborted') {
-          console.warn('SpeechRecognition error:', event.error);
-        }
-        isListeningRef.current = false;
-        setIsListening(false);
+      mediaRecorder.onstop = () => {
+        stream.getTracks().forEach((track) => track.stop());
+        const actualMime = mediaRecorder.mimeType || chosenMime || 'audio/webm';
+        const audioBlob = new Blob(audioChunksRef.current, { type: actualMime });
+        const audioUrl = URL.createObjectURL(audioBlob);
+
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const base64Data = reader.result as string;
+          await handleSendRecordedAudio(audioUrl, base64Data, actualMime);
+        };
+        reader.readAsDataURL(audioBlob);
       };
 
-      recognition.onend = () => {
-        isListeningRef.current = false;
-        setIsListening(false);
-      };
-
-      recognitionRef.current = recognition;
-      recognition.start();
+      // Emit chunks continuously
+      mediaRecorder.start(250);
+      setIsRecordingAudio(true);
+      setRecordingSeconds(0);
+      timerRef.current = setInterval(() => {
+        setRecordingSeconds((prev) => prev + 1);
+      }, 1000);
     } catch (err: any) {
-      console.warn('Erro ao iniciar reconhecimento de voz:', err);
-      isListeningRef.current = false;
-      setIsListening(false);
+      console.warn('Erro ao acessar microfone:', err);
+      const isPermission =
+        err.name === 'NotAllowedError' ||
+        err.name === 'PermissionDeniedError' ||
+        err.name === 'SecurityError' ||
+        err.message?.toLowerCase().includes('permission') ||
+        err.message?.toLowerCase().includes('not allowed');
+
+      if (isPermission) {
+        setMicErrorNotice(
+          'Permissão de microfone negada. Toque no ícone de permissões/cadeado da barra de endereço para permitir o microfone.'
+        );
+      } else {
+        setMicErrorNotice(
+          'Não foi possível iniciar o microfone no seu aparelho. Verifique se outro app está usando o microfone.'
+        );
+      }
+    }
+  };
+
+  const cancelVoiceRecording = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.ondataavailable = null;
+      mediaRecorderRef.current.onstop = null;
+      try {
+        mediaRecorderRef.current.stop();
+      } catch {}
+    }
+    setIsRecordingAudio(false);
+    setRecordingSeconds(0);
+  };
+
+  const stopAndSendVoiceRecording = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      try {
+        mediaRecorderRef.current.stop();
+      } catch {}
+    }
+    setIsRecordingAudio(false);
+    setRecordingSeconds(0);
+  };
+
+  const handleSendRecordedAudio = async (
+    audioUrl: string,
+    base64Data: string,
+    mimeType = 'audio/webm'
+  ) => {
+    const timeStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const userAudioMsg: ChatMessage = {
+      id: `voice-${Date.now()}`,
+      role: 'user',
+      text: 'Mensagem de voz enviada',
+      timestamp: timeStr,
+      isVoiceNote: true,
+      audioUrl: audioUrl,
+      transcription: 'Interpretando áudio pelo Gemini...',
+      status: 'sent',
+    };
+
+    setMessages((prev) => [...prev, userAudioMsg]);
+    setIsLoading(true);
+
+    try {
+      const history = messages.slice(-6).map((m) => ({
+        role: m.role as 'user' | 'assistant',
+        text: m.text,
+      }));
+
+      const res = await sendChatAudio(base64Data, mimeType, history);
+      userAudioMsg.transcription = res.transcription;
+
+      const liaAudioUrl = await fetchAudioTts(res.reply).catch(() => '');
+
+      const botMsg: ChatMessage = {
+        id: `bot-audio-${Date.now()}`,
+        role: 'assistant',
+        text: res.reply,
+        timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+        needsHumanHandoff: res.needsHumanHandoff,
+        audioUrl: liaAudioUrl,
+        status: 'read',
+      };
+
+      setMessages((prev) => [...prev, botMsg]);
+    } catch (err) {
+      console.error('Erro ao enviar áudio:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -592,56 +686,116 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Mic Permission Warning Notice if blocked */}
+      {micErrorNotice && (
+        <div className="mt-2 p-3 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs flex flex-col gap-2 animate-in fade-in duration-200 shadow-md">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-start gap-2 font-medium leading-tight">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
+              <span>{micErrorNotice}</span>
+            </div>
+            <button
+              onClick={() => setMicErrorNotice(null)}
+              className="text-slate-400 hover:text-white p-0.5 cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+          <button
+            onClick={() => {
+              setMicErrorNotice(null);
+              handleSendAudioSample();
+            }}
+            className="self-start text-[11px] font-bold px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 transition cursor-pointer"
+          >
+            Testar com Áudio de Demonstração
+          </button>
+        </div>
+      )}
+
       {/* Floating Bottom Input Bar */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSend();
-        }}
-        className={`mt-3 rounded-2xl p-2 border shadow-lg flex items-center gap-2 transition-colors ${
+      <div
+        className={`mt-3 rounded-2xl p-2 border shadow-lg transition-colors ${
           isDay
             ? 'bg-white border-slate-200 text-slate-900'
             : 'bg-[#1c1e2b] border-[#2d3145] text-white'
         }`}
       >
-        {/* Speech to text button */}
-        <button
-          type="button"
-          onClick={toggleSpeechRecognition}
-          className={`w-10 h-10 rounded-xl flex items-center justify-center transition active:scale-95 ${
-            isListening
-              ? 'bg-rose-500 text-white animate-pulse'
-              : isDay
-              ? 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200'
-              : 'bg-[#272b3d] text-slate-300 hover:text-white hover:bg-[#32364c]'
-          }`}
-          title={isListening ? 'Parar gravação' : 'Falar por voz'}
-        >
-          {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-        </button>
+        {isRecordingAudio ? (
+          <div className="flex items-center justify-between px-2 py-1">
+            <div className="flex items-center gap-2 text-rose-500 font-semibold text-xs animate-pulse">
+              <span className="w-3 h-3 rounded-full bg-rose-500 animate-ping" />
+              <span>
+                Gravando sua voz: {Math.floor(recordingSeconds / 60)}:
+                {recordingSeconds % 60 < 10 ? '0' : ''}
+                {recordingSeconds % 60}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={cancelVoiceRecording}
+                type="button"
+                className="p-2 text-slate-400 hover:text-rose-500 rounded-xl transition active:scale-95 cursor-pointer"
+                title="Cancelar gravação"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={stopAndSendVoiceRecording}
+                type="button"
+                className="w-9 h-9 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 flex items-center justify-center transition active:scale-95 font-bold shadow-md cursor-pointer"
+                title="Enviar áudio"
+              >
+                <Send className="w-4 h-4 ml-0.5" />
+              </button>
+            </div>
+          </div>
+        ) : (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSend();
+            }}
+            className="flex items-center gap-2"
+          >
+            {/* Native Microphone Button */}
+            <button
+              type="button"
+              onClick={startVoiceRecording}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition active:scale-95 cursor-pointer ${
+                isDay
+                  ? 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                  : 'bg-[#272b3d] text-slate-300 hover:text-white hover:bg-[#32364c]'
+              }`}
+              title="Gravar mensagem de voz"
+            >
+              <Mic className="w-4 h-4 text-emerald-500" />
+            </button>
 
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder={isListening ? 'Ouvindo sua voz...' : 'Digite sua mensagem...'}
-          disabled={isLoading}
-          className={`flex-1 bg-transparent border-none text-sm focus:outline-none px-2 ${
-            isDay
-              ? 'text-slate-900 placeholder-slate-400'
-              : 'text-white placeholder-slate-500'
-          }`}
-        />
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Digite sua mensagem ou clique no microfone..."
+              disabled={isLoading}
+              className={`flex-1 bg-transparent border-none text-sm focus:outline-none px-2 ${
+                isDay
+                  ? 'text-slate-900 placeholder-slate-400'
+                  : 'text-white placeholder-slate-500'
+              }`}
+            />
 
-        <button
-          type="submit"
-          disabled={!input.trim() || isLoading}
-          className="w-10 h-10 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 text-slate-950 font-bold flex items-center justify-center transition active:scale-95 shadow-md shrink-0 cursor-pointer"
-          title="Enviar mensagem"
-        >
-          <Send className="w-4 h-4" />
-        </button>
-      </form>
+            <button
+              type="submit"
+              disabled={!input.trim() || isLoading}
+              className="w-10 h-10 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 text-slate-950 font-bold flex items-center justify-center transition active:scale-95 shadow-md shrink-0 cursor-pointer"
+              title="Enviar mensagem"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </form>
+        )}
+      </div>
 
       {/* Quick shortcuts below input */}
       <div

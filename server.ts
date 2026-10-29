@@ -741,9 +741,12 @@ apiRouter.post('/chat-audio', async (req, res) => {
       });
     }
 
+    let cleanMime = (mimeType || 'audio/webm').split(';')[0].trim().toLowerCase();
+    if (cleanMime === 'audio/m4a' || cleanMime === 'audio/x-m4a') cleanMime = 'audio/mp4';
+
     const audioPart = {
       inlineData: {
-        mimeType: mimeType,
+        mimeType: cleanMime,
         data: cleanBase64,
       },
     };
@@ -770,7 +773,7 @@ Responda estritamente em formato JSON com as chaves:
     });
 
     const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('AUDIO_TIMEOUT')), 3800)
+      setTimeout(() => reject(new Error('AUDIO_TIMEOUT')), 9000)
     );
 
     const response = await Promise.race([geminiAudioCall, timeoutPromise]);
