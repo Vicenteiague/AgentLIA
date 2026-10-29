@@ -82,7 +82,7 @@ export function extractKeywords(text: string): string[] {
  * Builds the official baseline topics with full semantics, rich entities, and precise responses.
  */
 function getBaselineTopics(cfg: BusinessConfig): SemanticTopic[] {
-  const whatsappUrl = `https://wa.me/${cfg.businessPhone.replace(/\D/g, '') || '5567993174512'}`;
+  const whatsappUrl = `https://wa.me/${cfg.businessPhone.replace(/\D/g, '') || '5567993174612'}`;
   const websiteUrl = cfg.website || 'https://www.startmktlocal.com.br/';
 
   return [
@@ -618,7 +618,7 @@ export function matchSemanticQuery(
   // Fallback for general queries without strict semantic index lock
   const defaultWhatsApp = config?.businessPhone
     ? `https://wa.me/${config.businessPhone.replace(/\D/g, '')}`
-    : 'https://wa.me/5567993174512';
+    : 'https://wa.me/5567993174612';
 
   return {
     isMatch: false,

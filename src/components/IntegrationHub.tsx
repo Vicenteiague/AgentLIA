@@ -47,7 +47,7 @@ export const IntegrationHub: React.FC<IntegrationHubProps> = ({
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Simulator state
-  const [simPhone, setSimPhone] = useState('5567993174512');
+  const [simPhone, setSimPhone] = useState('5567993174612');
   const [simMessage, setSimMessage] = useState('Olá! Gostaria de saber os valores para Criação de Sites e Biosite com IA');
   const [simIsAudio, setSimIsAudio] = useState(false);
   const [simLoading, setSimLoading] = useState(false);

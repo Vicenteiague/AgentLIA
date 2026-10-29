@@ -243,7 +243,7 @@ R: Resposta direta, sem enrolação, com proposta de valor e terminando com perg
                   companyName: 'Start Mkt Local',
                   botName: 'LIA',
                   botRole: 'Especialista de atendimento e vendas',
-                  businessPhone: '+55 67 99317-4512',
+                  businessPhone: '+55 67 99317-4612',
                   website: 'https://www.startmktlocal.com.br/',
                   catalogUrl: 'https://www.startmktlocal.com.br/',
                   systemPromptAddendum: OFFICIAL_KNOWLEDGE_BASE,

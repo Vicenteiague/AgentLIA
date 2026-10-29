@@ -37,7 +37,7 @@ export default function App() {
     companyName: 'Start Mkt Local',
     botName: 'LIA',
     botRole: 'Especialista de atendimento e vendas',
-    businessPhone: '+55 67 99317-4512',
+    businessPhone: '+55 67 99317-4612',
     website: 'https://www.startmktlocal.com.br/',
     websiteConectacard: 'https://www.startmktlocal.com.br/',
     websiteSuperlimpo: 'https://www.startmktlocal.com.br/',

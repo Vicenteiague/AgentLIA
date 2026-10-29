@@ -66,7 +66,7 @@ export const OFFICIAL_KNOWLEDGE_BASE = `# 1. IDENTIDADE E OBJETIVO
 - **Localização:** Ponta Porã MS atuamos em todo Brasil
 - **Horário de Funcionamento:** Segunda a Sexta, das 08h às 18h | Sábado, das 08h às 12h.
 - **Formas de Pagamento:** PIX , Cartão em até 3x sem juros, Cartão de Débito.
-- **Link de Contato/WhatsApp:** https://wa.me/5567993174512
+- **Link de Contato/WhatsApp:** https://wa.me/5567993174612
 - **Link de Contato/Website:** https://www.startmktlocal.com.br/
 
 ---
@@ -122,19 +122,19 @@ R: Entendo perfeitamente! Mas vale lembrar que todos os nossos produtos são de 
 ---
 
 # 5. TODOS OS LINKS QUE ENVIAR DEVE SER CLICÁVEL
-- Envie sempre em formato de link clicável (ex: [https://wa.me/5567993174512](https://wa.me/5567993174512), [https://www.startmktlocal.com.br/](https://www.startmktlocal.com.br/), [https://vicenteiaguebiositegoogleia.vercel.app/](https://vicenteiaguebiositegoogleia.vercel.app/), [https://avaliacard.vercel.app/](https://avaliacard.vercel.app/)).
+- Envie sempre em formato de link clicável (ex: [https://wa.me/5567993174612](https://wa.me/5567993174612), [https://www.startmktlocal.com.br/](https://www.startmktlocal.com.br/), [https://vicenteiaguebiositegoogleia.vercel.app/](https://vicenteiaguebiositegoogleia.vercel.app/), [https://avaliacard.vercel.app/](https://avaliacard.vercel.app/)).
 
 ---
 
 # 6. REGRAS DE OURO (Guardrails)
-1. **Fidelidade aos Dados:** Responda APENAS com base nas informações acima. Se o cliente perguntar algo que não está neste documento, diga exatamente: "Para te confirmar esse detalhe específico sem erro, vou te passar o contato direto do nosso especialista: [- **Link de Contato/WhatsApp:** https://wa.me/5567993174512]".
+1. **Fidelidade aos Dados:** Responda APENAS com base nas informações acima. Se o cliente perguntar algo que não está neste documento, diga exatamente: "Para te confirmar esse detalhe específico sem erro, vou te passar o contato direto do nosso especialista: [- **Link de Contato/WhatsApp:** https://wa.me/5567993174612]".
 2. **Proibido Inventar:** Nunca invente preços, prazos, promoções ou serviços que não estejam na seção 3 e 7.
 3. **Formatação:** Nunca envie blocos gigantes de texto. Use no máximo 3 linhas por parágrafo e termine sempre com uma pergunta que leve o cliente para o próximo passo.
 
 ---
 
 # 7. INTEGRAÇÕES GOOGLE (Agenda, Planilhas e Meu Negócio)
-- **Google Agenda (Calendar):** Conectamos e agendamos consultas/reuniões de apresentação de serviços diretamente na Google Agenda. Você pode agendar na aba Google do app ou pelo WhatsApp [https://wa.me/5567993174512](https://wa.me/5567993174512).
+- **Google Agenda (Calendar):** Conectamos e agendamos consultas/reuniões de apresentação de serviços diretamente na Google Agenda. Você pode agendar na aba Google do app ou pelo WhatsApp [https://wa.me/5567993174612](https://wa.me/5567993174612).
 - **Google Sheets (Planilhas):** Gravamos e sincronizamos os leads e contatos recebidos automaticamente em planilhas do Google Drive.
 - **Google Meu Negócio & AvaliaCard:** Gerenciamos seu perfil no Google Meu Negócio e fornecemos o **AvaliaCard NFC** ([https://avaliacard.vercel.app/](https://avaliacard.vercel.app/)) por R$ 89,00 + frete grátis, para os clientes avaliarem sua empresa com 5 estrelas por aproximação no balcão.`;
 
@@ -142,7 +142,7 @@ const DEFAULT_CONFIG: BusinessConfig = {
   companyName: 'Start Mkt Local',
   botName: 'LIA',
   botRole: 'Especialista de atendimento e vendas',
-  businessPhone: '+55 67 99317-4512',
+  businessPhone: '+55 67 99317-4612',
   website: 'https://www.startmktlocal.com.br/',
   websiteConectacard: 'https://www.startmktlocal.com.br/',
   websiteSuperlimpo: 'https://www.startmktlocal.com.br/',
@@ -203,9 +203,9 @@ export async function sendChatMessage(
     } else if (q.includes('garantia')) {
       reply = `Você tem **15 dias de garantia total**! Se tiver qualquer problema, resolvemos sem burocracia.\n\nQuer dar início ao seu projeto hoje mesmo com segurança total?`;
     } else if (q.includes('desconto')) {
-      reply = `No pagamento via PIX já aplicamos **5% de desconto imediato**! Se quiser fechar um pacote com mais de um serviço, posso chamar nosso especialista no WhatsApp para liberar uma condição especial: [WhatsApp Especialista](https://wa.me//5567993174512).\n\nQual serviço você gostaria de fechar?`;
+      reply = `No pagamento via PIX já aplicamos **5% de desconto imediato**! Se quiser fechar um pacote com mais de um serviço, posso chamar nosso especialista no WhatsApp para liberar uma condição especial: [WhatsApp Especialista](https://wa.me/5567993174612).\n\nQual serviço você gostaria de fechar?`;
     } else if (q.includes('falar com alguém') || q.includes('alguem') || q.includes('humano') || q.includes('atendente') || q.includes('especialista')) {
-      reply = `Certamente! Nosso especialista está disponível diretamente no WhatsApp: [Clique para conversar](https://wa.me//5567993174512) ou ligue ${DEFAULT_CONFIG.businessPhone}.\n\nAtendimento de Seg a Sex (08h às 18h) e Sáb (08h às 12h). Como posso adiantar seu contato?`;
+      reply = `Certamente! Nosso especialista está disponível diretamente no WhatsApp: [Clique para conversar](https://wa.me/5567993174612) ou ligue ${DEFAULT_CONFIG.businessPhone}.\n\nAtendimento de Seg a Sex (08h às 18h) e Sáb (08h às 12h). Como posso adiantar seu contato?`;
       needsHumanHandoff = true;
     } else if (q.includes('serviço') || q.includes('servico')) {
       reply = `Na **Start Mkt Local**, temos 6 serviços principais: Criação de Sites, Gestor Google Meu Negócio, Biosite com IA 24h, Gestor de Tráfego Meta Ads, Agente de IA no WhatsApp e Avaliacard NFC.\n\nQual dessas soluções você gostaria de conhecer?`;
@@ -397,8 +397,8 @@ export async function sendChatMultimodal(
     const isPdf = mimeType.toLowerCase().includes('pdf') || fileName.toLowerCase().endsWith('.pdf');
     return {
       reply: isPdf
-        ? `Recebi seu documento PDF "${fileName}"! Nossos especialistas podem avaliar o conteúdo com você no WhatsApp: https://wa.me/5567993174512`
-        : `Recebi sua imagem com sucesso! Vamos analisar os detalhes no WhatsApp: https://wa.me/5567993174512`,
+        ? `Recebi seu documento PDF "${fileName}"! Nossos especialistas podem avaliar o conteúdo com você no WhatsApp: https://wa.me/5567993174612`
+        : `Recebi sua imagem com sucesso! Vamos analisar os detalhes no WhatsApp: https://wa.me/5567993174612`,
       fileDescription: isPdf ? `PDF: ${fileName}` : `Imagem: ${fileName}`,
       needsHumanHandoff: false,
       isFallback: true,
