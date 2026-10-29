@@ -15,8 +15,11 @@ import {
   Trash2,
   AlertCircle,
   X,
+  Paperclip,
+  FileText,
+  Image as ImageIcon,
 } from 'lucide-react';
-import { BusinessConfig, ChatMessage, sendChatMessage, sendChatAudio, fetchAudioTts } from '../services/api';
+import { BusinessConfig, ChatMessage, sendChatMessage, sendChatAudio, fetchAudioTts, sendChatMultimodal } from '../services/api';
 import { AudioPlayer } from './AudioPlayer';
 import { VoiceNoteBubble } from './VoiceNoteBubble';
 import { FormattedMessageText } from './FormattedMessageText';
@@ -80,6 +83,17 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<any>(null);
+
+  // File upload state for Images & PDFs
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [selectedFile, setSelectedFile] = useState<{
+    file: File;
+    base64: string;
+    previewUrl: string;
+    isPdf: boolean;
+    fileName: string;
+    fileSize: string;
+  } | null>(null);
 
   const getBestMimeType = (): string => {
     if (typeof MediaRecorder === 'undefined') return 'audio/webm';
@@ -242,7 +256,98 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+    const fileSizeStr = (file.size / 1024).toFixed(1) + ' KB';
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result as string;
+      const previewUrl = URL.createObjectURL(file);
+      setSelectedFile({
+        file,
+        base64,
+        previewUrl,
+        isPdf,
+        fileName: file.name,
+        fileSize: fileSizeStr,
+      });
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const handleSendFile = async () => {
+    if (!selectedFile || isLoading) return;
+
+    const fileData = selectedFile;
+    setSelectedFile(null);
+
+    const timeStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const userCaption = input.trim();
+    setInput('');
+
+    const userMsg: ChatMessage = {
+      id: `file-${Date.now()}`,
+      role: 'user',
+      text: userCaption || (fileData.isPdf ? `Documento PDF: ${fileData.fileName}` : `Imagem enviada`),
+      timestamp: timeStr,
+      status: 'sent',
+      fileUrl: fileData.previewUrl,
+      fileName: fileData.fileName,
+      fileType: fileData.isPdf ? 'pdf' : 'image',
+      fileSize: fileData.fileSize,
+    };
+
+    setMessages((prev) => [...prev, userMsg]);
+    setIsLoading(true);
+
+    try {
+      const history = messages
+        .filter((m) => m.role === 'user' || m.role === 'assistant')
+        .slice(-6)
+        .map((m) => ({
+          role: m.role as 'user' | 'assistant',
+          text: m.text,
+        }));
+
+      const res = await sendChatMultimodal(
+        fileData.base64,
+        fileData.file.type || (fileData.isPdf ? 'application/pdf' : 'image/jpeg'),
+        fileData.fileName,
+        userCaption,
+        history
+      );
+
+      const liaAudioUrl = await fetchAudioTts(res.reply).catch(() => '');
+
+      const botMsg: ChatMessage = {
+        id: `bot-file-${Date.now()}`,
+        role: 'assistant',
+        text: res.reply,
+        timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+        needsHumanHandoff: res.needsHumanHandoff,
+        audioUrl: liaAudioUrl,
+        status: 'read',
+      };
+
+      setMessages((prev) => [...prev, botMsg]);
+    } catch (err) {
+      console.error('Erro ao enviar arquivo:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSend = async (textToSend?: string) => {
+    if (selectedFile) {
+      await handleSendFile();
+      return;
+    }
+
     const text = (textToSend || input).trim();
     if (!text || isLoading) return;
 
@@ -578,6 +683,40 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                       : 'bg-[#222534] text-slate-100 rounded-tl-xs border border-[#31364d]'
                   }`}
                 >
+                  {/* Attached Image inside Chat bubble */}
+                  {msg.fileUrl && msg.fileType === 'image' && (
+                    <div className="mb-2.5 rounded-xl overflow-hidden border border-black/10">
+                      <img
+                        src={msg.fileUrl}
+                        alt={msg.fileName || 'Imagem'}
+                        className="max-h-60 w-full object-cover rounded-lg"
+                      />
+                    </div>
+                  )}
+
+                  {/* Attached PDF document inside Chat bubble */}
+                  {msg.fileUrl && msg.fileType === 'pdf' && (
+                    <a
+                      href={msg.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mb-2.5 p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center gap-3 text-left hover:bg-red-500/20 transition cursor-pointer"
+                      title="Abrir Documento PDF"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-red-500 text-white flex items-center justify-center shrink-0">
+                        <FileText className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-bold text-xs truncate text-red-500 dark:text-red-400">
+                          {msg.fileName || 'documento.pdf'}
+                        </div>
+                        <div className="text-[10px] text-slate-400">
+                          Documento PDF • {msg.fileSize || 'Visualizar'}
+                        </div>
+                      </div>
+                    </a>
+                  )}
+
                   {/* Message Content with Clickable Links */}
                   <FormattedMessageText
                     text={msg.text}
@@ -713,6 +852,49 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </div>
       )}
 
+      {/* Hidden File Input for Images and PDFs */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept="image/*,application/pdf"
+        className="hidden"
+        onChange={handleFileChange}
+      />
+
+      {/* Selected Attachment Preview Bar */}
+      {selectedFile && (
+        <div className="mt-2 p-2.5 rounded-2xl bg-slate-100 dark:bg-[#181a26] border border-slate-300 dark:border-slate-700 flex items-center justify-between gap-2 animate-in fade-in duration-150 shadow-sm">
+          <div className="flex items-center gap-2.5 min-w-0">
+            {selectedFile.isPdf ? (
+              <div className="w-9 h-9 rounded-xl bg-red-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+                <FileText className="w-5 h-5" />
+              </div>
+            ) : (
+              <img
+                src={selectedFile.previewUrl}
+                alt="Preview"
+                className="w-9 h-9 rounded-xl object-cover shrink-0 border"
+              />
+            )}
+            <div className="min-w-0 text-left">
+              <div className="text-xs font-bold truncate max-w-[220px] text-slate-800 dark:text-slate-200">
+                {selectedFile.fileName}
+              </div>
+              <div className="text-[10px] text-slate-400">
+                {selectedFile.isPdf ? 'Documento PDF' : 'Imagem'} • {selectedFile.fileSize}
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={() => setSelectedFile(null)}
+            className="p-1.5 rounded-full text-slate-400 hover:text-rose-500 transition cursor-pointer"
+            title="Remover anexo"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Floating Bottom Input Bar */}
       <div
         className={`mt-3 rounded-2xl p-2 border shadow-lg transition-colors ${
@@ -772,11 +954,27 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               <Mic className="w-4 h-4 text-emerald-500" />
             </button>
 
+            {/* Paperclip Button for Images and PDFs */}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition active:scale-95 cursor-pointer ${
+                selectedFile
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                  : isDay
+                  ? 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                  : 'bg-[#272b3d] text-slate-300 hover:text-white hover:bg-[#32364c]'
+              }`}
+              title="Anexar Imagem ou Documento PDF"
+            >
+              <Paperclip className="w-4 h-4 text-emerald-500" />
+            </button>
+
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Digite sua mensagem ou clique no microfone..."
+              placeholder={selectedFile ? 'Adicionar legenda ao anexo...' : 'Digite sua mensagem, grave voz ou anexe PDF/imagem...'}
               disabled={isLoading}
               className={`flex-1 bg-transparent border-none text-sm focus:outline-none px-2 ${
                 isDay
@@ -787,9 +985,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
             <button
               type="submit"
-              disabled={!input.trim() || isLoading}
+              disabled={(!input.trim() && !selectedFile) || isLoading}
               className="w-10 h-10 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 text-slate-950 font-bold flex items-center justify-center transition active:scale-95 shadow-md shrink-0 cursor-pointer"
-              title="Enviar mensagem"
+              title={selectedFile ? 'Enviar anexo' : 'Enviar mensagem'}
             >
               <Send className="w-4 h-4" />
             </button>

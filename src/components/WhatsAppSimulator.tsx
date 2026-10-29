@@ -19,8 +19,10 @@ import {
   Trash2,
   AlertCircle,
   X,
+  FileText,
+  Image as ImageIcon,
 } from 'lucide-react';
-import { BusinessConfig, ChatMessage, sendChatMessage, fetchAudioTts, sendChatAudio } from '../services/api';
+import { BusinessConfig, ChatMessage, sendChatMessage, fetchAudioTts, sendChatAudio, sendChatMultimodal } from '../services/api';
 import { VoiceNoteBubble } from './VoiceNoteBubble';
 import { AudioPlayer } from './AudioPlayer';
 import { FormattedMessageText } from './FormattedMessageText';
@@ -77,6 +79,17 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<any>(null);
+
+  // File upload state for Images & PDFs
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [selectedFile, setSelectedFile] = useState<{
+    file: File;
+    base64: string;
+    previewUrl: string;
+    isPdf: boolean;
+    fileName: string;
+    fileSize: string;
+  } | null>(null);
 
   const getBestMimeType = (): string => {
     if (typeof MediaRecorder === 'undefined') return 'audio/webm';
@@ -239,7 +252,95 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+    const fileSizeStr = (file.size / 1024).toFixed(1) + ' KB';
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result as string;
+      const previewUrl = URL.createObjectURL(file);
+      setSelectedFile({
+        file,
+        base64,
+        previewUrl,
+        isPdf,
+        fileName: file.name,
+        fileSize: fileSizeStr,
+      });
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const handleSendFile = async () => {
+    if (!selectedFile || isLoading) return;
+
+    const fileData = selectedFile;
+    setSelectedFile(null);
+
+    const timeStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const userCaption = input.trim();
+    setInput('');
+
+    const userMsg: ChatMessage = {
+      id: `wa-file-${Date.now()}`,
+      role: 'user',
+      text: userCaption || (fileData.isPdf ? `Documento PDF: ${fileData.fileName}` : `Imagem enviada`),
+      timestamp: timeStr,
+      status: 'sent',
+      fileUrl: fileData.previewUrl,
+      fileName: fileData.fileName,
+      fileType: fileData.isPdf ? 'pdf' : 'image',
+      fileSize: fileData.fileSize,
+    };
+
+    setMessages((prev) => [...prev, userMsg]);
+    setIsLoading(true);
+
+    try {
+      const history = messages.slice(-6).map((m) => ({
+        role: m.role as 'user' | 'assistant',
+        text: m.text,
+      }));
+
+      const res = await sendChatMultimodal(
+        fileData.base64,
+        fileData.file.type || (fileData.isPdf ? 'application/pdf' : 'image/jpeg'),
+        fileData.fileName,
+        userCaption,
+        history
+      );
+
+      const liaAudioUrl = await fetchAudioTts(res.reply).catch(() => '');
+
+      const botMsg: ChatMessage = {
+        id: `wa-b-${Date.now()}`,
+        role: 'assistant',
+        text: res.reply,
+        timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+        needsHumanHandoff: res.needsHumanHandoff,
+        audioUrl: liaAudioUrl,
+        status: 'read',
+      };
+
+      setMessages((prev) => [...prev, botMsg]);
+    } catch (err) {
+      console.error('Erro ao enviar anexo:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSend = async (textToSend?: string) => {
+    if (selectedFile) {
+      await handleSendFile();
+      return;
+    }
+
     const text = (textToSend || input).trim();
     if (!text || isLoading) return;
 
@@ -495,6 +596,40 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
                       : 'bg-[#202c33] text-slate-100 rounded-tl-none'
                   }`}
                 >
+                  {/* Attached Image inside WhatsApp bubble */}
+                  {m.fileUrl && m.fileType === 'image' && (
+                    <div className="mb-2 rounded-lg overflow-hidden border border-black/10">
+                      <img
+                        src={m.fileUrl}
+                        alt={m.fileName || 'Imagem'}
+                        className="max-h-56 w-full object-cover rounded-md"
+                      />
+                    </div>
+                  )}
+
+                  {/* Attached PDF document inside WhatsApp bubble */}
+                  {m.fileUrl && m.fileType === 'pdf' && (
+                    <a
+                      href={m.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mb-2 p-2 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-2.5 text-left hover:bg-red-500/20 transition cursor-pointer"
+                      title="Abrir Documento PDF"
+                    >
+                      <div className="w-9 h-9 rounded bg-red-500 text-white flex items-center justify-center shrink-0">
+                        <FileText className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-bold text-xs truncate text-red-600 dark:text-red-400">
+                          {m.fileName || 'documento.pdf'}
+                        </div>
+                        <div className="text-[10px] text-slate-400">
+                          Documento PDF • {m.fileSize || 'Visualizar'}
+                        </div>
+                      </div>
+                    </a>
+                  )}
+
                   <FormattedMessageText
                     text={m.text}
                     isUser={m.role === 'user'}
@@ -602,6 +737,49 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
           </div>
         )}
 
+        {/* Hidden File Input for Images and PDFs */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          accept="image/*,application/pdf"
+          className="hidden"
+          onChange={handleFileChange}
+        />
+
+        {/* Selected Attachment Preview Bar */}
+        {selectedFile && (
+          <div className="mx-2 mb-2 p-2 rounded-xl bg-slate-100 dark:bg-[#1f2c34] border border-slate-300 dark:border-slate-700 flex items-center justify-between gap-2 animate-in fade-in duration-150">
+            <div className="flex items-center gap-2 min-w-0">
+              {selectedFile.isPdf ? (
+                <div className="w-8 h-8 rounded-lg bg-red-500 text-white flex items-center justify-center shrink-0">
+                  <FileText className="w-4 h-4" />
+                </div>
+              ) : (
+                <img
+                  src={selectedFile.previewUrl}
+                  alt="Preview"
+                  className="w-8 h-8 rounded-lg object-cover shrink-0 border"
+                />
+              )}
+              <div className="min-w-0 text-left">
+                <div className="text-xs font-bold truncate max-w-[180px] text-slate-800 dark:text-slate-200">
+                  {selectedFile.fileName}
+                </div>
+                <div className="text-[10px] text-slate-400">
+                  {selectedFile.isPdf ? 'Documento PDF' : 'Imagem'} • {selectedFile.fileSize}
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => setSelectedFile(null)}
+              className="p-1 rounded-full text-slate-400 hover:text-rose-500 transition cursor-pointer"
+              title="Remover anexo"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
         {/* WhatsApp Input Bar */}
         <div
           className={`px-2 py-2 flex items-center gap-2 rounded-b-[26px] ${
@@ -637,13 +815,15 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
             <>
               <button
                 type="button"
-                className={`p-1 ${isDay ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200'}`}
-              >
-                <Smile className="w-5 h-5" />
-              </button>
-              <button
-                type="button"
-                className={`p-1 ${isDay ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200'}`}
+                onClick={() => fileInputRef.current?.click()}
+                className={`p-1.5 rounded-full transition cursor-pointer active:scale-95 ${
+                  selectedFile
+                    ? 'text-emerald-500 bg-emerald-500/10'
+                    : isDay
+                    ? 'text-slate-500 hover:text-slate-700 hover:bg-slate-200'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
+                }`}
+                title="Anexar Imagem ou Documento PDF"
               >
                 <Paperclip className="w-5 h-5" />
               </button>
@@ -659,7 +839,7 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Mensagem"
+                  placeholder={selectedFile ? 'Adicionar legenda ao anexo...' : 'Mensagem'}
                   className={`w-full text-sm px-3 py-2 rounded-lg border-none focus:outline-none shadow-2xs ${
                     isDay
                       ? 'bg-white text-slate-900 placeholder-slate-400'
@@ -668,11 +848,12 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
                 />
               </form>
 
-              {input.trim() ? (
+              {input.trim() || selectedFile ? (
                 <button
                   onClick={() => handleSend()}
                   type="button"
                   className="w-9 h-9 rounded-full bg-[#00a884] text-white flex items-center justify-center hover:bg-[#008f6f] transition active:scale-95 shadow cursor-pointer"
+                  title={selectedFile ? 'Enviar anexo' : 'Enviar mensagem'}
                 >
                   <Send className="w-4 h-4 ml-0.5" />
                 </button>

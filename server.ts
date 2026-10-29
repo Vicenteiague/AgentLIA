@@ -3,6 +3,12 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { GoogleGenAI, ThinkingLevel } from '@google/genai';
+import {
+  buildSemanticIndex,
+  matchSemanticQuery,
+  SemanticIndex,
+  SemanticMatchResult,
+} from './src/utils/semanticIndexer.js';
 
 dotenv.config();
 
@@ -12,7 +18,8 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
-app.use(express.json());
+app.use(express.json({ limit: '20mb' }));
+app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 
 // Initialize Google GenAI
 const apiKey = process.env.GEMINI_API_KEY || '';
@@ -197,6 +204,19 @@ ${config.systemPromptAddendum && config.systemPromptAddendum !== OFFICIAL_KNOWLE
 `;
 }
 
+// Semantic Index Cache
+let cachedSemanticIndex: SemanticIndex | null = null;
+let cachedKnowledgeText = '';
+
+function getActiveSemanticIndex(cfg: BusinessConfig): SemanticIndex {
+  const currentText = cfg.systemPromptAddendum || OFFICIAL_KNOWLEDGE_BASE;
+  if (!cachedSemanticIndex || cachedKnowledgeText !== currentText) {
+    cachedSemanticIndex = buildSemanticIndex(currentText, cfg);
+    cachedKnowledgeText = currentText;
+  }
+  return cachedSemanticIndex;
+}
+
 // Instant Knowledge Base Semantic Matcher (< 20ms response time)
 function findKnowledgeBaseAnswer(
   query: string,
@@ -204,20 +224,18 @@ function findKnowledgeBaseAnswer(
 ): { reply: string; needsHumanHandoff: boolean } | null {
   const q = query.toLowerCase().trim();
 
-  // 1. Directives in systemPromptAddendum (custom additions)
-  if (cfg.systemPromptAddendum && cfg.systemPromptAddendum !== OFFICIAL_KNOWLEDGE_BASE) {
-    const lines = cfg.systemPromptAddendum.split('\n').map((l) => l.trim()).filter((l) => l.length > 5 && !l.startsWith('#'));
-    for (const line of lines) {
-      const lowerLine = line.toLowerCase();
-      const queryWords = q.split(/[\s,?.!]+/).filter((w) => w.length >= 4);
-      const matches = queryWords.filter((w) => lowerLine.includes(w));
-      if (matches.length >= 2) {
-        return {
-          reply: `Olá! Conforme nossas informações:\n\n${line}\n\nQuer que eu te passe mais detalhes sobre isso?`,
-          needsHumanHandoff: false,
-        };
-      }
+  // 1. Semantic Index Matching (Instant < 5ms semantic topic recovery with entity grounding)
+  try {
+    const semIndex = getActiveSemanticIndex(cfg);
+    const semMatch = matchSemanticQuery(query, semIndex, cfg);
+    if (semMatch.isMatch && semMatch.confidence >= 35) {
+      return {
+        reply: semMatch.reply,
+        needsHumanHandoff: semMatch.needsHumanHandoff,
+      };
     }
+  } catch (err) {
+    console.warn('Erro ao processar correspondência semântica:', err);
   }
 
   // 2. Greetings
@@ -629,7 +647,41 @@ apiRouter.post('/config', (req, res) => {
   try {
     const updates = req.body;
     config = { ...config, ...updates };
+    // Clear cache if addendum updated
+    if (updates.systemPromptAddendum !== undefined) {
+      cachedSemanticIndex = null;
+    }
     res.json({ success: true, config });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Semantic Index & Real-time Test Endpoints
+apiRouter.get('/semantic-index', (req, res) => {
+  try {
+    const semIndex = getActiveSemanticIndex(config);
+    res.json({ success: true, index: semIndex });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+apiRouter.post('/semantic-test', (req, res) => {
+  try {
+    const { query = '', addendum } = req.body;
+    const testCfg = addendum ? { ...config, systemPromptAddendum: addendum } : config;
+    const semIndex = buildSemanticIndex(testCfg.systemPromptAddendum, testCfg);
+    const result = matchSemanticQuery(query, semIndex, testCfg);
+    res.json({
+      success: true,
+      result,
+      stats: {
+        totalTopics: semIndex.topics.length,
+        totalKeywords: semIndex.totalKeywords,
+        categories: semIndex.categories,
+      },
+    });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -805,6 +857,100 @@ Responda estritamente em formato JSON com as chaves:
     res.json({
       transcription,
       reply,
+      needsHumanHandoff: false,
+      isFallback: true,
+    });
+  }
+});
+
+// Multimodal endpoint - Processes Images and PDFs with Google Gemini Vision & Document Understanding
+apiRouter.post('/chat-multimodal', async (req, res) => {
+  const { fileBase64, mimeType = 'image/jpeg', fileName = 'anexo', message = '', history = [] } = req.body;
+
+  if (!fileBase64) {
+    return res.status(400).json({ error: 'Arquivo não fornecido' });
+  }
+
+  const cleanBase64 = fileBase64.replace(/^data:[^;]+;base64,/, '');
+  const lowerMime = (mimeType || '').toLowerCase();
+  const lowerName = (fileName || '').toLowerCase();
+  const isPdf = lowerMime.includes('pdf') || lowerName.endsWith('.pdf');
+
+  try {
+    if (!process.env.GEMINI_API_KEY) {
+      const fallbackReply = isPdf
+        ? `Recebi seu documento PDF "${fileName}". Analisamos contratos, catálogos e orçamentos em PDF com máxima precisão! Para combinarmos uma proposta personalizada, você pode nos chamar no WhatsApp: [Falar no WhatsApp](https://wa.me/5567993174512).`
+        : `Recebi sua imagem com sucesso! Se for um comprovante de pagamento PIX ou referência de site, já está registrado para conferência. Quer falar diretamente com nosso especialista no WhatsApp? [Falar no WhatsApp](https://wa.me/5567993174512)`;
+      return res.json({
+        reply: fallbackReply,
+        fileDescription: isPdf ? `Documento PDF: ${fileName}` : `Imagem enviada: ${fileName}`,
+        needsHumanHandoff: false,
+        isFallback: true,
+      });
+    }
+
+    const filePart = {
+      inlineData: {
+        mimeType: isPdf ? 'application/pdf' : mimeType.split(';')[0].trim(),
+        data: cleanBase64,
+      },
+    };
+
+    let promptText = '';
+    if (isPdf) {
+      promptText = `O cliente enviou este documento PDF anexado ("${fileName}").
+Mensagem acompanhante do cliente: "${message || 'Por favor, analise este arquivo PDF.'}"
+
+Instruções para você, LIA (${config.botRole} da ${config.companyName}):
+1. Leia e interprete detalhadamente o conteúdo deste documento PDF (tabela de preços, catálogo de produtos, orçamentos, contratos ou apresentação empresarial).
+2. Forneça uma resposta clara, amigável, consultiva e em português brasileiro (máximo de 3 parágrafos objetivos).
+3. Resuma os pontos mais relevantes do documento e conecte com o atendimento e as soluções da ${config.companyName} (Criação de Sites a partir de R$ 500, Biosite com IA por R$ 167, AvaliaCard NFC por R$ 89, Google Meu Negócio, Tráfego Pago).
+4. Termine sempre com uma pergunta para o próximo passo ou convite para fechar no WhatsApp [https://wa.me/5567993174512](https://wa.me/5567993174512).`;
+    } else {
+      promptText = `O cliente enviou esta imagem anexada ("${fileName}").
+Mensagem acompanhante do cliente: "${message || 'Por favor, analise esta imagem.'}"
+
+Instruções para você, LIA (${config.botRole} da ${config.companyName}):
+1. Observe detalhadamente o conteúdo da imagem (seja comprovante de PIX/pagamento, referência de design de site, fachada de empresa, foto de produto, logotipo ou captura de tela).
+2. Se for um comprovante de PIX: identifique o valor, a data e confirme o recebimento com entusiasmo, orientando os próximos passos da ativação do serviço!
+3. Se for uma referência de site ou modelo: comente sobre a estética e explique que desenvolvemos sites modernos nesse padrão a partir de R$ 500,00 com entrega em 7 dias!
+4. Se for foto de produto, fachada ou cartão: elogie o negócio e sugira como a ${config.companyName} pode acelerar as vendas locais (Google Meu Negócio, AvaliaCard NFC, Biosite com IA ou Anúncios).
+5. Mantenha tom simpático e termine sempre com uma pergunta para avançar.`;
+    }
+
+    const geminiCall = ai.models.generateContent({
+      model: 'gemini-3.8-flash',
+      contents: [filePart, { text: promptText }],
+      config: {
+        systemInstruction: buildSystemPrompt(),
+        thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL },
+        maxOutputTokens: 600,
+        temperature: 0.4,
+      },
+    });
+
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('MULTIMODAL_TIMEOUT')), 12000)
+    );
+
+    const response = await Promise.race([geminiCall, timeoutPromise]);
+    const reply = response.text || (isPdf ? 'Documento PDF analisado com sucesso.' : 'Imagem analisada com sucesso.');
+    const needsHumanHandoff = checkHumanHandoff(message || fileName, reply);
+
+    res.json({
+      reply,
+      fileDescription: isPdf ? `PDF: ${fileName}` : `Imagem: ${fileName}`,
+      needsHumanHandoff,
+      isFallback: false,
+    });
+  } catch (err: any) {
+    console.error('Gemini Multimodal Error:', err);
+    const reply = isPdf
+      ? `Consegui receber o seu documento PDF "${fileName}"! Para te passar todos os detalhes e valores específicos sem erro, vou avisar nosso especialista: [Falar no WhatsApp](https://wa.me/5567993174512).`
+      : `Recebi a sua imagem com sucesso! Já registrei aqui. Quer que eu te passe mais detalhes sobre nossos serviços no WhatsApp? [Falar no WhatsApp](https://wa.me/5567993174512)`;
+    res.json({
+      reply,
+      fileDescription: isPdf ? `PDF: ${fileName}` : `Imagem: ${fileName}`,
       needsHumanHandoff: false,
       isFallback: true,
     });

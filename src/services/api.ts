@@ -14,6 +14,17 @@ export interface BusinessConfig {
   systemPromptAddendum: string;
 }
 
+export type {
+  SemanticTopic,
+  SemanticIndex,
+  SemanticMatchResult,
+} from '../utils/semanticIndexer';
+export {
+  buildSemanticIndex,
+  matchSemanticQuery,
+  extractKeywords,
+} from '../utils/semanticIndexer';
+
 export interface ChatMessage {
   id: string;
   role: 'user' | 'assistant' | 'system';
@@ -24,6 +35,10 @@ export interface ChatMessage {
   transcription?: string;
   needsHumanHandoff?: boolean;
   status?: 'sending' | 'sent' | 'read';
+  fileUrl?: string;
+  fileName?: string;
+  fileType?: 'image' | 'pdf';
+  fileSize?: string;
 }
 
 export interface WebhookLog {
@@ -351,3 +366,43 @@ export async function simulateWhatsAppIncomingMessage(
     };
   }
 }
+
+export async function sendChatMultimodal(
+  fileBase64: string,
+  mimeType: string,
+  fileName: string,
+  message: string = '',
+  history: Array<{ role: 'user' | 'assistant'; text: string }> = []
+): Promise<{ reply: string; fileDescription: string; needsHumanHandoff?: boolean; isFallback?: boolean }> {
+  try {
+    const res = await fetch('/api/chat-multimodal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fileBase64,
+        mimeType,
+        fileName,
+        message,
+        history,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Status ${res.status}`);
+    }
+
+    return await res.json();
+  } catch (err) {
+    console.warn('Erro ao processar arquivo multimodal:', err);
+    const isPdf = mimeType.toLowerCase().includes('pdf') || fileName.toLowerCase().endsWith('.pdf');
+    return {
+      reply: isPdf
+        ? `Recebi seu documento PDF "${fileName}"! Nossos especialistas podem avaliar o conteúdo com você no WhatsApp: https://wa.me/5567993174512`
+        : `Recebi sua imagem com sucesso! Vamos analisar os detalhes no WhatsApp: https://wa.me/5567993174512`,
+      fileDescription: isPdf ? `PDF: ${fileName}` : `Imagem: ${fileName}`,
+      needsHumanHandoff: false,
+      isFallback: true,
+    };
+  }
+}
+
