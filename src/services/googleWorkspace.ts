@@ -9,8 +9,18 @@ import {
 } from 'firebase/auth';
 import firebaseConfig from '../../firebase-applet-config.json';
 
+// Allow environment variable overrides when deployed to external platforms like Vercel
+export const activeFirebaseConfig = {
+  projectId: (import.meta as any).env?.VITE_FIREBASE_PROJECT_ID || firebaseConfig.projectId,
+  appId: (import.meta as any).env?.VITE_FIREBASE_APP_ID || firebaseConfig.appId,
+  apiKey: (import.meta as any).env?.VITE_FIREBASE_API_KEY || firebaseConfig.apiKey,
+  authDomain: (import.meta as any).env?.VITE_FIREBASE_AUTH_DOMAIN || firebaseConfig.authDomain,
+  storageBucket: (import.meta as any).env?.VITE_FIREBASE_STORAGE_BUCKET || firebaseConfig.storageBucket,
+  messagingSenderId: (import.meta as any).env?.VITE_FIREBASE_MESSAGING_SENDER_ID || firebaseConfig.messagingSenderId,
+};
+
 // Reuse app instance if already initialized
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+const app = getApps().length === 0 ? initializeApp(activeFirebaseConfig) : getApp();
 export const auth = getAuth(app);
 
 // Configure Google Provider with the approved scopes
@@ -64,6 +74,14 @@ export const googleSignIn = async (): Promise<{ user: User; accessToken: string 
     return { user: result.user, accessToken: cachedAccessToken };
   } catch (error: any) {
     console.error('Sign in error:', error);
+    if (error?.code === 'auth/unauthorized-domain' || (error?.message && error.message.includes('auth/unauthorized-domain'))) {
+      const currentHost = typeof window !== 'undefined' ? window.location.hostname : 'agentelia.vercel.app';
+      const customErr = new Error(
+        `auth/unauthorized-domain: O domínio "${currentHost}" não está autorizado no Firebase Authentication do projeto "${activeFirebaseConfig.projectId}".`
+      );
+      (customErr as any).code = 'auth/unauthorized-domain';
+      throw customErr;
+    }
     throw error;
   } finally {
     isSigningIn = false;

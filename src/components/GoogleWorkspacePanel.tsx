@@ -16,6 +16,10 @@ import {
   Send,
   Star,
   QrCode,
+  Copy,
+  Check,
+  Globe,
+  ShieldAlert,
 } from 'lucide-react';
 import { User } from 'firebase/auth';
 import {
@@ -31,6 +35,7 @@ import {
   fetchSheetLeads,
   CalendarEvent,
   LeadRow,
+  activeFirebaseConfig,
 } from '../services/googleWorkspace';
 import { BusinessConfig } from '../services/api';
 
@@ -50,6 +55,58 @@ export const GoogleWorkspacePanel: React.FC<GoogleWorkspacePanelProps> = ({
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [copiedDomain, setCopiedDomain] = useState(false);
+
+  const currentDomain =
+    typeof window !== 'undefined' && window.location.hostname
+      ? window.location.hostname
+      : 'agentelia.vercel.app';
+
+  const copyCurrentDomain = () => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(currentDomain);
+      setCopiedDomain(true);
+      setTimeout(() => setCopiedDomain(false), 3000);
+    }
+  };
+
+  const startDemoMode = () => {
+    setIsDemoMode(true);
+    setAuthError(null);
+    setCurrentUser({
+      displayName: 'Start Mkt Local (Modo Demonstração)',
+      email: 'contato@startmktlocal.com.br',
+      photoURL: '',
+    } as any);
+    setAccessToken('demo_access_token');
+    setEvents([
+      {
+        id: 'demo-ev-1',
+        summary: 'Consultoria Estratégica - Start Mkt Local',
+        description: 'Alinhamento de implantação de Catálogo e Atendimento via IA LIA.',
+        start: { dateTime: new Date(Date.now() + 86400000).toISOString() },
+        end: { dateTime: new Date(Date.now() + 90000000).toISOString() },
+        htmlLink: 'https://calendar.google.com',
+      },
+      {
+        id: 'demo-ev-2',
+        summary: 'Demonstração de Vendas - Super Limpo Produtos',
+        description: 'Reunião comercial agendada pela LIA no WhatsApp.',
+        start: { dateTime: new Date(Date.now() + 172800000).toISOString() },
+        end: { dateTime: new Date(Date.now() + 176400000).toISOString() },
+        htmlLink: 'https://calendar.google.com',
+      },
+    ]);
+    const mockSheetId = 'demo-sheet-leads-lia';
+    setSpreadsheetId(mockSheetId);
+    setSheetUrl('https://docs.google.com/spreadsheets/d/demo-sheet-leads-lia/edit');
+    setSheetRows([
+      ['29/10/2026 14:20', 'Roberto Silva', '+55 67 99317-4612', 'Criação de Sites', 'Novo Lead (Qualificado)', 'Capturado via IA LIA • Atendimento Automático'],
+      ['29/10/2026 15:45', 'Juliana Souza', '+55 67 99812-3344', 'Gestão de Tráfego', 'Agendamento Realizado', 'Capturado via IA LIA • Catálogo Interativo'],
+      ['29/10/2026 17:10', 'Marcos Oliveira', '+55 67 99123-8899', 'Chatbot WhatsApp', 'Proposta Enviada', 'Capturado via IA LIA • Atendimento WhatsApp'],
+    ]);
+  };
 
   // Calendar State
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -99,30 +156,35 @@ export const GoogleWorkspacePanel: React.FC<GoogleWorkspacePanelProps> = ({
   useEffect(() => {
     const unsubscribe = initAuth(
       (user, token) => {
-        setCurrentUser(user);
-        setAccessToken(token);
+        if (!isDemoMode) {
+          setCurrentUser(user);
+          setAccessToken(token);
+        }
       },
       () => {
-        setCurrentUser(null);
-        setAccessToken(null);
+        if (!isDemoMode) {
+          setCurrentUser(null);
+          setAccessToken(null);
+        }
       }
     );
     return () => unsubscribe();
-  }, []);
+  }, [isDemoMode]);
 
   // When logged in, auto-load calendar events
   useEffect(() => {
-    if (currentUser && accessToken) {
+    if (currentUser && accessToken && !isDemoMode) {
       loadCalendarEvents(accessToken);
       if (spreadsheetId) {
         loadSheetData(spreadsheetId, accessToken);
       }
     }
-  }, [currentUser, accessToken]);
+  }, [currentUser, accessToken, isDemoMode]);
 
   const handleSignIn = async () => {
     setIsLoggingIn(true);
     setAuthError(null);
+    setIsDemoMode(false);
     try {
       const res = await googleSignIn();
       if (res) {
@@ -138,13 +200,17 @@ export const GoogleWorkspacePanel: React.FC<GoogleWorkspacePanelProps> = ({
   };
 
   const handleSignOut = async () => {
-    await logout();
+    if (!isDemoMode) {
+      await logout();
+    }
+    setIsDemoMode(false);
     setCurrentUser(null);
     setAccessToken(null);
     setEvents([]);
   };
 
   const loadCalendarEvents = async (token?: string) => {
+    if (isDemoMode) return;
     setIsLoadingEvents(true);
     setCalendarError(null);
     try {
@@ -230,6 +296,54 @@ export const GoogleWorkspacePanel: React.FC<GoogleWorkspacePanelProps> = ({
     const action = pendingAction;
     setPendingAction(null);
 
+    // If running in interactive demo mode, simulate responses instantly
+    if (isDemoMode) {
+      if (action.type === 'create_event') {
+        setIsCreatingEvent(true);
+        const newEv: CalendarEvent = {
+          id: `demo-${Date.now()}`,
+          summary: action.payload.summary,
+          description: action.payload.description,
+          start: { dateTime: action.payload.startDateTime },
+          end: { dateTime: action.payload.endDateTime },
+          htmlLink: 'https://calendar.google.com',
+        };
+        setEvents((prev) => [newEv, ...prev]);
+        setCalendarSuccess('Evento simulado criado com sucesso na Agenda!');
+        setTimeout(() => setCalendarSuccess(null), 4000);
+        setIsCreatingEvent(false);
+      } else if (action.type === 'delete_event') {
+        setEvents((prev) => prev.filter((ev) => ev.id !== action.payload.eventId));
+        setCalendarSuccess('Evento removido da agenda!');
+        setTimeout(() => setCalendarSuccess(null), 4000);
+      } else if (action.type === 'create_sheet') {
+        setIsCreatingSheet(true);
+        const demoId = `demo-sheet-${Date.now()}`;
+        setSpreadsheetId(demoId);
+        setSheetUrl('https://docs.google.com/spreadsheets/d/demo/edit');
+        setSheetSuccess('Planilha simulada de Leads criada com sucesso!');
+        setTimeout(() => setSheetSuccess(null), 4000);
+        setIsCreatingSheet(false);
+      } else if (action.type === 'add_lead') {
+        setIsAddingLead(true);
+        setSheetRows((prev) => [
+          [
+            action.payload.date,
+            action.payload.name,
+            action.payload.phone,
+            action.payload.service,
+            action.payload.status,
+            action.payload.notes,
+          ],
+          ...prev,
+        ]);
+        setSheetSuccess('Lead gravado com sucesso na planilha simulada!');
+        setTimeout(() => setSheetSuccess(null), 4000);
+        setIsAddingLead(false);
+      }
+      return;
+    }
+
     try {
       if (action.type === 'create_event') {
         setIsCreatingEvent(true);
@@ -276,6 +390,7 @@ export const GoogleWorkspacePanel: React.FC<GoogleWorkspacePanelProps> = ({
   };
 
   const loadSheetData = async (id: string, token?: string) => {
+    if (isDemoMode) return;
     if (!id) return;
     setIsLoadingSheet(true);
     setSheetError(null);
@@ -322,38 +437,49 @@ export const GoogleWorkspacePanel: React.FC<GoogleWorkspacePanelProps> = ({
           </div>
 
           {/* Google Auth Status / Button */}
-          <div>
+          <div className="flex flex-col items-start md:items-end gap-2">
             {!currentUser ? (
-              <button
-                onClick={handleSignIn}
-                disabled={isLoggingIn}
-                className="gsi-material-button flex items-center gap-3 px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#1a1c29] text-slate-800 dark:text-slate-100 font-semibold text-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition shadow-sm cursor-pointer disabled:opacity-50"
-              >
-                <svg
-                  version="1.1"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 48 48"
-                  className="w-4 h-4 shrink-0"
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                <button
+                  onClick={handleSignIn}
+                  disabled={isLoggingIn}
+                  className="gsi-material-button flex items-center gap-3 px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#1a1c29] text-slate-800 dark:text-slate-100 font-semibold text-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition shadow-sm cursor-pointer disabled:opacity-50"
                 >
-                  <path
-                    fill="#EA4335"
-                    d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
-                  ></path>
-                  <path
-                    fill="#4285F4"
-                    d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
-                  ></path>
-                  <path
-                    fill="#FBBC05"
-                    d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
-                  ></path>
-                  <path
-                    fill="#34A853"
-                    d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
-                  ></path>
-                </svg>
-                <span>{isLoggingIn ? 'Conectando...' : 'Entrar com Google'}</span>
-              </button>
+                  <svg
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 48 48"
+                    className="w-4 h-4 shrink-0"
+                  >
+                    <path
+                      fill="#EA4335"
+                      d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
+                    ></path>
+                    <path
+                      fill="#4285F4"
+                      d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
+                    ></path>
+                    <path
+                      fill="#FBBC05"
+                      d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
+                    ></path>
+                    <path
+                      fill="#34A853"
+                      d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
+                    ></path>
+                  </svg>
+                  <span>{isLoggingIn ? 'Conectando...' : 'Entrar com Google'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={startDemoMode}
+                  className="px-3 py-2 rounded-xl text-xs font-semibold text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 flex items-center gap-1.5 transition cursor-pointer"
+                  title="Testar recursos sem precisar de login"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Modo Demonstração</span>
+                </button>
+              </div>
             ) : (
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
@@ -365,14 +491,19 @@ export const GoogleWorkspacePanel: React.FC<GoogleWorkspacePanelProps> = ({
                     />
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
-                      {currentUser.email?.[0].toUpperCase()}
+                      {isDemoMode ? <Sparkles className="w-4 h-4" /> : currentUser.email?.[0]?.toUpperCase()}
                     </div>
                   )}
                   <div className="text-left">
-                    <div className="text-xs font-bold leading-none truncate max-w-[150px]">
-                      {currentUser.displayName || 'Conta Conectada'}
+                    <div className="text-xs font-bold leading-none truncate max-w-[180px] flex items-center gap-1.5">
+                      <span>{currentUser.displayName || 'Conta Conectada'}</span>
+                      {isDemoMode && (
+                        <span className="px-1.5 py-0.2 rounded text-[9px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                          Demo
+                        </span>
+                      )}
                     </div>
-                    <div className="text-[10px] text-emerald-500 font-medium">
+                    <div className="text-[10px] text-emerald-500 font-medium truncate max-w-[180px]">
                       {currentUser.email}
                     </div>
                   </div>
@@ -380,7 +511,7 @@ export const GoogleWorkspacePanel: React.FC<GoogleWorkspacePanelProps> = ({
                 <button
                   onClick={handleSignOut}
                   className="p-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-rose-500/10 hover:text-rose-400 transition cursor-pointer"
-                  title="Desconectar Conta Google"
+                  title={isDemoMode ? 'Sair do Modo Demonstração' : 'Desconectar Conta Google'}
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
@@ -389,10 +520,105 @@ export const GoogleWorkspacePanel: React.FC<GoogleWorkspacePanelProps> = ({
           </div>
         </div>
 
+        {/* Auth Error Banner & Resolution Guide */}
         {authError && (
-          <div className="mt-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{authError}</span>
+          <div className="mt-5">
+            {authError.toLowerCase().includes('unauthorized-domain') ? (
+              <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200">
+                <div className="flex items-start gap-3">
+                  <ShieldAlert className="w-6 h-6 text-amber-400 shrink-0 mt-0.5" />
+                  <div className="flex-1 space-y-3">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-sm font-bold text-amber-300">
+                          Domínio da Vercel precisa de autorização no Firebase
+                        </h3>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-mono">
+                          auth/unauthorized-domain
+                        </span>
+                      </div>
+                      <p className="text-xs text-amber-100/90 mt-1 leading-relaxed">
+                        Por segurança, o Google/Firebase bloqueia o login quando o site roda em um domínio que ainda não foi cadastrado na lista de <strong>Domínios Autorizados</strong> do Firebase Authentication.
+                      </p>
+                    </div>
+
+                    {/* Domain badge & copy button */}
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      <span className="text-xs font-semibold text-slate-300">Seu domínio atual:</span>
+                      <div className="flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-lg border border-amber-500/30 font-mono text-xs text-white">
+                        <Globe className="w-3.5 h-3.5 text-amber-400" />
+                        <span>{currentDomain}</span>
+                        <button
+                          type="button"
+                          onClick={copyCurrentDomain}
+                          className="ml-2 px-2.5 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[11px] font-sans font-medium flex items-center gap-1 transition cursor-pointer"
+                        >
+                          {copiedDomain ? (
+                            <>
+                              <Check className="w-3 h-3 text-emerald-400" />
+                              <span className="text-emerald-400 font-bold">Copiado!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3" />
+                              <span>Copiar Domínio</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Step-by-step instructions */}
+                    <div className="bg-black/30 rounded-xl p-3 border border-amber-500/20 space-y-2 text-xs">
+                      <div className="font-semibold text-amber-300">Como autorizar em 3 passos:</div>
+                      <ol className="list-decimal list-inside space-y-1.5 text-slate-300">
+                        <li>
+                          Acesse o{' '}
+                          <a
+                            href={`https://console.firebase.google.com/project/${activeFirebaseConfig.projectId}/authentication/settings`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-amber-400 underline font-medium hover:text-amber-300 inline-flex items-center gap-1"
+                          >
+                            Firebase Console ➔ Authentication ➔ Settings <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </li>
+                        <li>
+                          Na aba <strong>Configurações (Settings)</strong>, localize a seção <strong>Domínios autorizados (Authorized domains)</strong>.
+                        </li>
+                        <li>
+                          Clique em <strong>Adicionar domínio</strong>, cole <code className="bg-black/50 px-1.5 py-0.5 rounded text-amber-300">{currentDomain}</code> e clique em <strong>Salvar</strong>.
+                        </li>
+                      </ol>
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="pt-2 flex flex-wrap items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={startDemoMode}
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-md transition cursor-pointer"
+                      >
+                        <Sparkles className="w-4 h-4 text-emerald-200" />
+                        <span>Ativar Modo Demonstração (Ver Recursos Sem Login)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAuthError(null)}
+                        className="text-xs text-slate-400 hover:text-white underline cursor-pointer"
+                      >
+                        Fechar aviso
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{authError}</span>
+              </div>
+            )}
           </div>
         )}
       </div>
