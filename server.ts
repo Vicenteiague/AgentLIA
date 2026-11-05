@@ -1047,7 +1047,7 @@ async function startServer() {
   });
 }
 
-// Only launch TCP listener when running standalone (not inside Vercel serverless environment)
-if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') {
+// Only launch TCP listener when running standalone (not inside Vercel or Netlify serverless environment)
+if (!process.env.VERCEL && !process.env.NETLIFY && process.env.NODE_ENV !== 'test') {
   startServer();
 }
