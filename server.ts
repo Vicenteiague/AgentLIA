@@ -771,96 +771,14 @@ apiRouter.post('/chat', async (req, res) => {
   }
 });
 
-// Audio Chat endpoint - Interprets customer voice notes using Google Gemini Multimodal
+// Audio endpoint - Deprecated / Audio disabled
 apiRouter.post('/chat-audio', async (req, res) => {
-  const { audioBase64, mimeType = 'audio/webm', history = [] } = req.body;
-
-  if (!audioBase64) {
-    return res.status(400).json({ error: 'Áudio não fornecido' });
-  }
-
-  const cleanBase64 = audioBase64.replace(/^data:[^;]+;base64,/, '');
-
-  try {
-    if (!process.env.GEMINI_API_KEY) {
-      const fallbackTranscription = 'Gostaria de saber mais sobre criação de sites e biosite com IA da Start Mkt Local';
-      const fallbackReply = getFallbackResponse(fallbackTranscription);
-      return res.json({
-        transcription: fallbackTranscription,
-        reply: fallbackReply,
-        needsHumanHandoff: false,
-        isFallback: true,
-      });
-    }
-
-    let cleanMime = (mimeType || 'audio/webm').split(';')[0].trim().toLowerCase();
-    if (cleanMime === 'audio/m4a' || cleanMime === 'audio/x-m4a') cleanMime = 'audio/mp4';
-
-    const audioPart = {
-      inlineData: {
-        mimeType: cleanMime,
-        data: cleanBase64,
-      },
-    };
-
-    const promptText = `Um cliente do WhatsApp enviou esta mensagem de áudio.
-Faça duas coisas:
-1. Transcreva com fidelidade o que o cliente falou no áudio.
-2. Como a assistente virtual LIA da ${config.companyName}, elabore uma resposta amigável, clara e prestativa para o cliente em português brasileiro.
-
-Responda estritamente em formato JSON com as chaves:
-{
-  "transcription": "Texto exato falado pelo cliente no áudio",
-  "reply": "Resposta acolhedora e prestativa da LIA"
-}`;
-
-    const geminiAudioCall = ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents: [audioPart, { text: promptText }],
-      config: {
-        systemInstruction: buildSystemPrompt(),
-        thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL },
-        responseMimeType: 'application/json',
-      },
-    });
-
-    const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('AUDIO_TIMEOUT')), 9000)
-    );
-
-    const response = await Promise.race([geminiAudioCall, timeoutPromise]);
-
-    let transcription = '';
-    let reply = '';
-
-    try {
-      const parsed = JSON.parse(response.text || '{}');
-      transcription = parsed.transcription || 'Mensagem de voz recebida';
-      reply = parsed.reply || getFallbackResponse(transcription);
-    } catch {
-      reply = response.text || getFallbackResponse('áudio');
-      transcription = 'Mensagem de voz recebida';
-    }
-
-    const needsHumanHandoff = checkHumanHandoff(transcription, reply);
-
-    res.json({
-      transcription,
-      reply,
-      needsHumanHandoff,
-      isFallback: false,
-    });
-  } catch (err: any) {
-    console.error('Gemini Audio Interpretation Error:', err);
-    const transcription = 'Áudio sobre dúvidas de produtos e serviços';
-    const reply = getFallbackResponse(transcription);
-    res.json({
-      transcription,
-      reply,
-      needsHumanHandoff: false,
-      isFallback: true,
-    });
-  }
+  res.json({
+    transcription: 'Mensagem de voz',
+    reply: 'Nosso atendimento agora é exclusivamente por escrito para maior agilidade e clareza. Como posso te ajudar hoje?',
+    needsHumanHandoff: false,
+    isFallback: false,
+  });
 });
 
 // Multimodal endpoint - Processes Images and PDFs with Google Gemini Vision & Document Understanding
@@ -957,58 +875,9 @@ Instruções para você, LIA (${config.botRole} da ${config.companyName}):
   }
 });
 
-// TTS (Text-to-Speech) Audio Endpoint for LIA's voice
+// TTS endpoint - Deprecated / Audio disabled
 apiRouter.post('/tts', async (req, res) => {
-  const { text } = req.body;
-  if (!text) {
-    return res.status(400).json({ error: 'Texto necessário' });
-  }
-
-  try {
-    if (!process.env.GEMINI_API_KEY) {
-      return res.status(400).json({ error: 'Chave Gemini necessária para áudio TTS' });
-    }
-
-    // Limit text length for fast TTS generation
-    const cleanText = text.replace(/[*_#`]/g, '').slice(0, 300);
-
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash-lite-tts',
-      contents: [
-        {
-          role: 'user',
-          parts: [
-            {
-              text: cleanText,
-              speechMetadata: {
-                style: 'Voz feminina brasileira, simpática, profissional e acolhedora de assistente virtual.',
-              },
-            },
-          ],
-        },
-      ],
-      config: {
-        responseModalities: ['AUDIO'],
-        speechConfig: {
-          voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: 'Kore' },
-          },
-        },
-      },
-    });
-
-    const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-    if (!base64Audio) {
-      return res.status(500).json({ error: 'Falha ao gerar áudio' });
-    }
-
-    res.json({
-      audioUrl: `data:audio/wav;base64,${base64Audio}`,
-    });
-  } catch (err: any) {
-    console.error('TTS Error:', err);
-    res.status(500).json({ error: 'Erro ao gerar áudio' });
-  }
+  res.json({ audioUrl: '' });
 });
 
 // WhatsApp Cloud API Webhook: GET for Verification

@@ -5,28 +5,17 @@ import {
   Video,
   MoreVertical,
   Paperclip,
-  Smile,
-  Mic,
-  MicOff,
   CheckCheck,
   Bot,
   ExternalLink,
   ShieldCheck,
-  Play,
-  Pause,
   RotateCcw,
   Share2,
-  Trash2,
-  AlertCircle,
   X,
   FileText,
-  Image as ImageIcon,
 } from 'lucide-react';
-import { BusinessConfig, ChatMessage, sendChatMessage, fetchAudioTts, sendChatAudio, sendChatMultimodal } from '../services/api';
-import { VoiceNoteBubble } from './VoiceNoteBubble';
-import { AudioPlayer } from './AudioPlayer';
+import { BusinessConfig, ChatMessage, sendChatMessage, sendChatMultimodal } from '../services/api';
 import { FormattedMessageText } from './FormattedMessageText';
-import { createSampleVoiceAudioUrl } from '../utils/audioHelper';
 
 interface WhatsAppSimulatorProps {
   config: BusinessConfig;
@@ -51,34 +40,11 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-  const [isListening, setIsListening] = useState(false);
-  const isListeningRef = useRef(false);
-  const recognitionRef = useRef<any>(null);
   const endRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
-
-  useEffect(() => {
-    return () => {
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.abort();
-        } catch {
-          // Ignore
-        }
-      }
-    };
-  }, []);
-
-  const [isRecordingAudio, setIsRecordingAudio] = useState(false);
-  const [recordingSeconds, setRecordingSeconds] = useState(0);
-  const [micErrorNotice, setMicErrorNotice] = useState<string | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const timerRef = useRef<any>(null);
 
   // File upload state for Images & PDFs
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -90,167 +56,6 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
     fileName: string;
     fileSize: string;
   } | null>(null);
-
-  const getBestMimeType = (): string => {
-    if (typeof MediaRecorder === 'undefined') return 'audio/webm';
-    const candidates = [
-      'audio/webm;codecs=opus',
-      'audio/webm',
-      'audio/mp4',
-      'audio/ogg;codecs=opus',
-      'audio/ogg',
-      'audio/wav',
-    ];
-    for (const mime of candidates) {
-      if (MediaRecorder.isTypeSupported(mime)) return mime;
-    }
-    return '';
-  };
-
-  const startVoiceRecording = async () => {
-    setMicErrorNotice(null);
-
-    // Verify browser support
-    if (typeof navigator === 'undefined' || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      setMicErrorNotice('Seu navegador não oferece suporte à captura de áudio direto.');
-      return;
-    }
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        },
-      });
-
-      audioChunksRef.current = [];
-      const chosenMime = getBestMimeType();
-      const options = chosenMime ? { mimeType: chosenMime } : undefined;
-      const mediaRecorder = options ? new MediaRecorder(stream, options) : new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data && event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-
-      mediaRecorder.onstop = () => {
-        stream.getTracks().forEach((track) => track.stop());
-        const actualMime = mediaRecorder.mimeType || chosenMime || 'audio/webm';
-        const audioBlob = new Blob(audioChunksRef.current, { type: actualMime });
-        const audioUrl = URL.createObjectURL(audioBlob);
-
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-          const base64Data = reader.result as string;
-          await handleSendRecordedAudio(audioUrl, base64Data, actualMime);
-        };
-        reader.readAsDataURL(audioBlob);
-      };
-
-      // Collect data chunks every 250ms
-      mediaRecorder.start(250);
-      setIsRecordingAudio(true);
-      setRecordingSeconds(0);
-      timerRef.current = setInterval(() => {
-        setRecordingSeconds((prev) => prev + 1);
-      }, 1000);
-    } catch (err: any) {
-      console.warn('Erro ao acessar microfone:', err);
-      const isPermission =
-        err.name === 'NotAllowedError' ||
-        err.name === 'PermissionDeniedError' ||
-        err.name === 'SecurityError' ||
-        err.message?.toLowerCase().includes('permission') ||
-        err.message?.toLowerCase().includes('not allowed');
-
-      if (isPermission) {
-        setMicErrorNotice(
-          'Permissão de microfone negada. Toque no ícone de permissões/cadeado da barra de endereço para permitir o microfone.'
-        );
-      } else {
-        setMicErrorNotice(
-          'Não foi possível iniciar o microfone no seu aparelho. Verifique se outro app está usando o microfone.'
-        );
-      }
-    }
-  };
-
-  const cancelVoiceRecording = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      mediaRecorderRef.current.ondataavailable = null;
-      mediaRecorderRef.current.onstop = null;
-      try {
-        mediaRecorderRef.current.stop();
-      } catch {}
-    }
-    setIsRecordingAudio(false);
-    setRecordingSeconds(0);
-  };
-
-  const stopAndSendVoiceRecording = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      try {
-        mediaRecorderRef.current.stop();
-      } catch {}
-    }
-    setIsRecordingAudio(false);
-    setRecordingSeconds(0);
-  };
-
-  const handleSendRecordedAudio = async (
-    audioUrl: string,
-    base64Data: string,
-    mimeType = 'audio/webm'
-  ) => {
-    const timeStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    const userAudioMsg: ChatMessage = {
-      id: `wa-voice-${Date.now()}`,
-      role: 'user',
-      text: 'Mensagem de voz enviada',
-      timestamp: timeStr,
-      isVoiceNote: true,
-      audioUrl: audioUrl,
-      transcription: 'Interpretando áudio pelo Gemini...',
-      status: 'sent',
-    };
-
-    setMessages((prev) => [...prev, userAudioMsg]);
-    setIsLoading(true);
-
-    try {
-      const history = messages.slice(-6).map((m) => ({
-        role: m.role as 'user' | 'assistant',
-        text: m.text,
-      }));
-
-      const res = await sendChatAudio(base64Data, mimeType, history);
-      userAudioMsg.transcription = res.transcription;
-
-      const liaAudioUrl = await fetchAudioTts(res.reply).catch(() => '');
-
-      const botMsg: ChatMessage = {
-        id: `wa-b-${Date.now()}`,
-        role: 'assistant',
-        text: res.reply,
-        timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-        needsHumanHandoff: res.needsHumanHandoff,
-        audioUrl: liaAudioUrl,
-        status: 'read',
-      };
-
-      setMessages((prev) => [...prev, botMsg]);
-    } catch (err) {
-      console.error('Erro áudio simulator:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -315,15 +120,12 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
         history
       );
 
-      const liaAudioUrl = await fetchAudioTts(res.reply).catch(() => '');
-
       const botMsg: ChatMessage = {
         id: `wa-b-${Date.now()}`,
         role: 'assistant',
         text: res.reply,
         timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
         needsHumanHandoff: res.needsHumanHandoff,
-        audioUrl: liaAudioUrl,
         status: 'read',
       };
 
@@ -386,58 +188,6 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
           timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
         },
       ]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSendAudioSample = async (sampleQuestionText?: string) => {
-    if (isLoading) return;
-
-    const queryText =
-      sampleQuestionText ||
-      'Olá LIA! Gostaria de saber os valores para Criação de Sites e Biosite com IA.';
-
-    const timeStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    const audioUrl = createSampleVoiceAudioUrl();
-
-    const userAudioMsg: ChatMessage = {
-      id: `wa-voice-${Date.now()}`,
-      role: 'user',
-      text: queryText,
-      timestamp: timeStr,
-      isVoiceNote: true,
-      audioUrl: audioUrl,
-      transcription: queryText,
-      status: 'sent',
-    };
-
-    setMessages((prev) => [...prev, userAudioMsg]);
-    setIsLoading(true);
-
-    try {
-      const history = messages.slice(-6).map((m) => ({
-        role: m.role as 'user' | 'assistant',
-        text: m.text,
-      }));
-
-      const res = await sendChatMessage(
-        `[MENSAGEM DE ÁUDIO DO CLIENTE TRANSCRIÇÃO]: "${queryText}"`,
-        history
-      );
-
-      const botMsg: ChatMessage = {
-        id: `wa-b-${Date.now()}`,
-        role: 'assistant',
-        text: res.reply,
-        timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-        needsHumanHandoff: res.needsHumanHandoff,
-        status: 'read',
-      };
-
-      setMessages((prev) => [...prev, botMsg]);
-    } catch (err) {
-      console.error('Erro áudio simulator:', err);
     } finally {
       setIsLoading(false);
     }
@@ -540,19 +290,7 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
 
           {/* Quick Suggestions in WhatsApp */}
           <div className="flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none">
-            <button
-              onClick={() => handleSendAudioSample()}
-              type="button"
-              className={`shrink-0 text-xs px-2.5 py-1 rounded-full shadow-2xs border transition active:scale-95 whitespace-nowrap flex items-center gap-1 font-semibold ${
-                isDay
-                  ? 'bg-emerald-100 text-emerald-800 border-emerald-300 hover:bg-emerald-200'
-                  : 'bg-emerald-900/40 text-emerald-300 border-emerald-700/60 hover:bg-emerald-900/60'
-              }`}
-            >
-              <Mic className="w-3 h-3 text-emerald-500" />
-              <span>🎙️ Áudio de Voz (Cliente)</span>
-            </button>
-            {config.quickQuestions.slice(0, 3).map((q, idx) => (
+            {config.quickQuestions.slice(0, 4).map((q, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSend(q)}
@@ -576,81 +314,57 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
                 m.role === 'user' ? 'items-end' : 'items-start'
               }`}
             >
-              {m.isVoiceNote ? (
-                <VoiceNoteBubble
-                  isUser={m.role === 'user'}
-                  audioUrl={m.audioUrl}
-                  transcription={m.transcription}
-                  timestamp={m.timestamp}
-                  theme={theme}
-                />
-              ) : (
-                <div
-                  className={`max-w-[85%] rounded-lg p-2.5 shadow-2xs text-[13px] leading-relaxed relative ${
-                    m.role === 'user'
-                      ? isDay
-                        ? 'bg-[#d9fdd3] text-slate-900 rounded-tr-none'
-                        : 'bg-[#005c4b] text-slate-100 rounded-tr-none'
-                      : isDay
-                      ? 'bg-white text-slate-900 rounded-tl-none'
-                      : 'bg-[#202c33] text-slate-100 rounded-tl-none'
-                  }`}
-                >
-                  {/* Attached Image inside WhatsApp bubble */}
-                  {m.fileUrl && m.fileType === 'image' && (
-                    <div className="mb-2 rounded-lg overflow-hidden border border-black/10">
-                      <img
-                        src={m.fileUrl}
-                        alt={m.fileName || 'Imagem'}
-                        className="max-h-56 w-full object-cover rounded-md"
-                      />
-                    </div>
-                  )}
-
-                  {/* Attached PDF document inside WhatsApp bubble */}
-                  {m.fileUrl && m.fileType === 'pdf' && (
-                    <a
-                      href={m.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mb-2 p-2 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-2.5 text-left hover:bg-red-500/20 transition cursor-pointer"
-                      title="Abrir Documento PDF"
-                    >
-                      <div className="w-9 h-9 rounded bg-red-500 text-white flex items-center justify-center shrink-0">
-                        <FileText className="w-5 h-5" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="font-bold text-xs truncate text-red-600 dark:text-red-400">
-                          {m.fileName || 'documento.pdf'}
-                        </div>
-                        <div className="text-[10px] text-slate-400">
-                          Documento PDF • {m.fileSize || 'Visualizar'}
-                        </div>
-                      </div>
-                    </a>
-                  )}
-
-                  <FormattedMessageText
-                    text={m.text}
-                    isUser={m.role === 'user'}
-                    theme={theme}
-                    variant="whatsapp"
-                  />
-
-                  {/* Audio Player for LIA's voice in WhatsApp */}
-                  {m.role === 'assistant' && (
-                    <AudioPlayer
-                      theme={theme}
-                      variant="whatsapp"
-                      text={m.text}
-                      audioUrl={m.audioUrl}
-                      onGenerateAudio={async () => {
-                        const url = await fetchAudioTts(m.text);
-                        m.audioUrl = url;
-                        return url;
-                      }}
+              <div
+                className={`max-w-[85%] rounded-lg p-2.5 shadow-2xs text-[13px] leading-relaxed relative ${
+                  m.role === 'user'
+                    ? isDay
+                      ? 'bg-[#d9fdd3] text-slate-900 rounded-tr-none'
+                      : 'bg-[#005c4b] text-slate-100 rounded-tr-none'
+                    : isDay
+                    ? 'bg-white text-slate-900 rounded-tl-none'
+                    : 'bg-[#202c33] text-slate-100 rounded-tl-none'
+                }`}
+              >
+                {/* Attached Image inside WhatsApp bubble */}
+                {m.fileUrl && m.fileType === 'image' && (
+                  <div className="mb-2 rounded-lg overflow-hidden border border-black/10">
+                    <img
+                      src={m.fileUrl}
+                      alt={m.fileName || 'Imagem'}
+                      className="max-h-56 w-full object-cover rounded-md"
                     />
-                  )}
+                  </div>
+                )}
+
+                {/* Attached PDF document inside WhatsApp bubble */}
+                {m.fileUrl && m.fileType === 'pdf' && (
+                  <a
+                    href={m.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mb-2 p-2 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-2.5 text-left hover:bg-red-500/20 transition cursor-pointer"
+                    title="Abrir Documento PDF"
+                  >
+                    <div className="w-9 h-9 rounded bg-red-500 text-white flex items-center justify-center shrink-0">
+                      <FileText className="w-5 h-5" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="font-bold text-xs truncate text-red-600 dark:text-red-400">
+                        {m.fileName || 'documento.pdf'}
+                      </div>
+                      <div className="text-[10px] text-slate-400">
+                        Documento PDF • {m.fileSize || 'Visualizar'}
+                      </div>
+                    </div>
+                  </a>
+                )}
+
+                <FormattedMessageText
+                  text={m.text}
+                  isUser={m.role === 'user'}
+                  theme={theme}
+                  variant="whatsapp"
+                />
 
                 {/* Human handoff card in WhatsApp */}
                 {m.needsHumanHandoff && (
@@ -689,9 +403,8 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
                   )}
                 </div>
               </div>
-            )}
-          </div>
-        ))}
+            </div>
+          ))}
 
           {/* Typing state in WhatsApp */}
           {isLoading && (
@@ -709,33 +422,6 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
 
           <div ref={endRef} />
         </div>
-
-        {/* Mic Permission Warning Notice if blocked */}
-        {micErrorNotice && (
-          <div className="mx-2 mb-2 p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs flex flex-col gap-1.5 animate-in fade-in duration-200">
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex items-start gap-1.5 font-medium leading-tight">
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
-                <span>{micErrorNotice}</span>
-              </div>
-              <button
-                onClick={() => setMicErrorNotice(null)}
-                className="text-slate-400 hover:text-white p-0.5"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-            <button
-              onClick={() => {
-                setMicErrorNotice(null);
-                handleSendAudioSample();
-              }}
-              className="self-start text-[11px] font-bold px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 transition"
-            >
-              Testar com Áudio de Demonstração
-            </button>
-          </div>
-        )}
 
         {/* Hidden File Input for Images and PDFs */}
         <input
@@ -786,89 +472,56 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
             isDay ? 'bg-[#f0f2f5]' : 'bg-[#202c33]'
           }`}
         >
-          {isRecordingAudio ? (
-            <div className="flex-1 flex items-center justify-between px-2 py-1">
-              <div className="flex items-center gap-2 text-rose-500 font-semibold text-xs animate-pulse">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-                <span>Gravando áudio: {Math.floor(recordingSeconds / 60)}:{recordingSeconds % 60 < 10 ? '0' : ''}{recordingSeconds % 60}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={cancelVoiceRecording}
-                  type="button"
-                  className="p-1.5 text-slate-400 hover:text-rose-500 transition active:scale-95"
-                  title="Cancelar gravação"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={stopAndSendVoiceRecording}
-                  type="button"
-                  className="w-8 h-8 rounded-full bg-[#00a884] hover:bg-[#008f6f] text-white flex items-center justify-center transition active:scale-95 shadow cursor-pointer"
-                  title="Enviar áudio"
-                >
-                  <Send className="w-3.5 h-3.5 ml-0.5" />
-                </button>
-              </div>
-            </div>
-          ) : (
-            <>
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className={`p-1.5 rounded-full transition cursor-pointer active:scale-95 ${
-                  selectedFile
-                    ? 'text-emerald-500 bg-emerald-500/10'
-                    : isDay
-                    ? 'text-slate-500 hover:text-slate-700 hover:bg-slate-200'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
-                }`}
-                title="Anexar Imagem ou Documento PDF"
-              >
-                <Paperclip className="w-5 h-5" />
-              </button>
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className={`p-1.5 rounded-full transition cursor-pointer active:scale-95 ${
+              selectedFile
+                ? 'text-emerald-500 bg-emerald-500/10'
+                : isDay
+                ? 'text-slate-500 hover:text-slate-700 hover:bg-slate-200'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
+            }`}
+            title="Anexar Imagem ou Documento PDF"
+          >
+            <Paperclip className="w-5 h-5" />
+          </button>
 
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSend();
-                }}
-                className="flex-1 flex items-center"
-              >
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder={selectedFile ? 'Adicionar legenda ao anexo...' : 'Mensagem'}
-                  className={`w-full text-sm px-3 py-2 rounded-lg border-none focus:outline-none shadow-2xs ${
-                    isDay
-                      ? 'bg-white text-slate-900 placeholder-slate-400'
-                      : 'bg-[#2a3942] text-slate-100 placeholder-slate-400'
-                  }`}
-                />
-              </form>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSend();
+            }}
+            className="flex-1 flex items-center"
+          >
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={selectedFile ? 'Adicionar legenda ao anexo...' : 'Mensagem'}
+              className={`w-full text-sm px-3 py-2 rounded-lg border-none focus:outline-none shadow-2xs ${
+                isDay
+                  ? 'bg-white text-slate-900 placeholder-slate-400'
+                  : 'bg-[#2a3942] text-slate-100 placeholder-slate-400'
+              }`}
+            />
+          </form>
 
-              {input.trim() || selectedFile ? (
-                <button
-                  onClick={() => handleSend()}
-                  type="button"
-                  className="w-9 h-9 rounded-full bg-[#00a884] text-white flex items-center justify-center hover:bg-[#008f6f] transition active:scale-95 shadow cursor-pointer"
-                  title={selectedFile ? 'Enviar anexo' : 'Enviar mensagem'}
-                >
-                  <Send className="w-4 h-4 ml-0.5" />
-                </button>
-              ) : (
-                <button
-                  onClick={startVoiceRecording}
-                  type="button"
-                  className="w-9 h-9 rounded-full bg-[#00a884] text-white hover:bg-[#008f6f] flex items-center justify-center transition active:scale-95 shadow cursor-pointer"
-                  title="Gravar áudio de voz"
-                >
-                  <Mic className="w-4 h-4" />
-                </button>
-              )}
-            </>
-          )}
+          <button
+            onClick={() => handleSend()}
+            disabled={(!input.trim() && !selectedFile) || isLoading}
+            type="button"
+            className={`w-9 h-9 rounded-full flex items-center justify-center transition active:scale-95 shadow cursor-pointer ${
+              input.trim() || selectedFile
+                ? 'bg-[#00a884] text-white hover:bg-[#008f6f]'
+                : isDay
+                ? 'bg-slate-300 text-slate-500 cursor-not-allowed opacity-60'
+                : 'bg-slate-700 text-slate-400 cursor-not-allowed opacity-60'
+            }`}
+            title={selectedFile ? 'Enviar anexo' : 'Enviar mensagem'}
+          >
+            <Send className="w-4 h-4 ml-0.5" />
+          </button>
         </div>
       </div>
 

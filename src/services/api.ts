@@ -249,50 +249,6 @@ export async function saveBusinessConfig(updates: Partial<BusinessConfig>): Prom
   }
 }
 
-export async function fetchAudioTts(text: string): Promise<string> {
-  try {
-    const res = await fetch('/api/tts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text }),
-    });
-    if (!res.ok) return '';
-    const data = await res.json();
-    return data.audioUrl || '';
-  } catch (err) {
-    console.warn('Não foi possível gerar áudio TTS no momento:', err);
-    return '';
-  }
-}
-
-export async function sendChatAudio(
-  audioBase64: string,
-  mimeType: string = 'audio/webm',
-  history: Array<{ role: 'user' | 'assistant'; text: string }> = []
-): Promise<{ transcription: string; reply: string; needsHumanHandoff?: boolean; isFallback?: boolean }> {
-  try {
-    const res = await fetch('/api/chat-audio', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ audioBase64, mimeType, history }),
-    });
-
-    if (!res.ok) {
-      throw new Error(`Status ${res.status}`);
-    }
-
-    return await res.json();
-  } catch (err) {
-    console.warn('Erro ao processar áudio no servidor, gerando fallback:', err);
-    return {
-      transcription: 'Gostaria de saber os valores para Criação de Sites e Biosite com IA',
-      reply: 'Olá! Ouvi seu áudio com atenção. Para **Criação de Sites**, trabalhamos a partir de R$ 500,00 com entrega em 7 dias! E o **Biosite com Atendimento Virtual IA 24h** custa R$ 167,00 + R$ 50,00/mês de manutenção. Quer que eu te envie o modelo de biosite funcionando para você testar?',
-      needsHumanHandoff: false,
-      isFallback: true,
-    };
-  }
-}
-
 export async function fetchWebhookLogs(): Promise<WebhookLog[]> {
   try {
     const res = await fetch('/api/webhook-logs');
