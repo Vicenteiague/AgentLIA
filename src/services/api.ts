@@ -100,11 +100,11 @@ Seja honesta: diga que é a assistente virtual da Start Mkt Local e que pode pas
 - Inclui: criação e gestão do perfil da empresa no Google.
 - Valor: a combinar.
 
-3. Biosite com Atendimento Virtual
+3. Biosite com Atendimento Virtual (BiositesAI)
 - Para: empresas de todo o Brasil.
 - Inclui: biosite com atendimento 24h por agente de IA treinado para saber tudo da empresa.
 - Valor: R$ 167,00 + R$ 50,00 por mês de manutenção do agente de IA.
-- Modelo: https://vicenteiaguebiositegoogleia.vercel.app/
+- Modelo: https://biositesaisuperlimpo.netlify.app/
 
 4. Gestão de Tráfego (Meta Ads)
 - Para: empresas de todo o Brasil.
@@ -116,9 +116,10 @@ Seja honesta: diga que é a assistente virtual da Start Mkt Local e que pode pas
 - Inclui: agente de IA no WhatsApp da empresa, responsável pelo atendimento, com conhecimento total do negócio.
 - Valor: a combinar.
 
-6. AvaliaCard
+6. AvaliaCard (também chamado de Cartão de Avaliação do Google ou Placa de Avaliação do Google)
+- IMPORTANTE: "Cartão de Avaliação do Google" e "Placa de Avaliação do Google" são exatamente o mesmo produto que o "AvaliaCard".
 - Para: empresas de todo o Brasil.
-- Inclui: cartão NFC e QR Code com link direto para a página de avaliação do Google.
+- Inclui: cartão/placa com tecnologia NFC (aproximação) e QR Code com link direto para a página de avaliação do Google da empresa.
 - Valor: R$ 89,00 com frete grátis.
 - Site: https://avaliacard.vercel.app/
 
@@ -144,8 +145,8 @@ const DEFAULT_CONFIG: BusinessConfig = {
   botRole: 'Especialista de atendimento e vendas',
   businessPhone: '+55 67 99317-4612',
   website: 'https://www.startmktlocal.com.br/',
-  websiteConectacard: 'https://www.startmktlocal.com.br/',
-  websiteSuperlimpo: 'https://www.startmktlocal.com.br/',
+  websiteConectacard: 'https://avaliacard.vercel.app/',
+  websiteSuperlimpo: 'https://biositesaisuperlimpo.netlify.app/',
   catalogUrl: 'https://www.startmktlocal.com.br/',
   whatsappVerifyToken: 'lia_token_whatsapp_2026',
   whatsappAccessToken: '',
@@ -159,7 +160,7 @@ const DEFAULT_CONFIG: BusinessConfig = {
     'Tem desconto no PIX?',
     'E aí mano, quero um bagulho pra aparecer no Google',
     'Como funciona o Biosite com IA?',
-    'Quero o AvaliaCard',
+    'Quero a Placa de Avaliação do Google (AvaliaCard)',
   ],
   systemPromptAddendum: OFFICIAL_KNOWLEDGE_BASE,
 };
@@ -200,16 +201,28 @@ export async function sendChatMessage(
       reply = `Você tem 15 dias de garantia total. Se qualquer coisa não ficar como combinado, a gente resolve sem burocracia. Quer seguir com a gente?`;
     } else if (q.includes('site') && !q.includes('bio')) {
       reply = `Oi! Tudo bem? Aqui na Start Mkt Local os sites começam a partir de R$ 500,00 e ficam prontos em 7 dias.\n\nMe conta, qual é o seu negócio? Assim eu vejo o que faz mais sentido pra você.`;
+    } else if (
+      q.includes('avaliacard') ||
+      q.includes('avalia card') ||
+      q.includes('nfc') ||
+      q.includes('cartão de avaliação') ||
+      q.includes('cartao de avaliacao') ||
+      q.includes('placa de avaliação') ||
+      q.includes('placa de avaliacao') ||
+      q.includes('placa do google') ||
+      q.includes('cartão do google') ||
+      q.includes('cartao do google') ||
+      q.includes('plaquinha')
+    ) {
+      reply = `Boa! O Cartão ou Placa de Avaliação do Google é o nosso AvaliaCard: ele tem NFC (aproximação) e QR Code pra levar seu cliente direto pra avaliação da sua empresa no Google, e sai por R$ 89,00 com frete grátis.\n\nOlha ele funcionando aqui: https://avaliacard.vercel.app/\n\nQuer garantir o seu com frete grátis?`;
+    } else if (q.includes('bio') || q.includes('superlimpo')) {
+      reply = `Show! O Biosite vem com atendimento 24h por um agente de IA que sabe tudo da sua empresa, por R$ 167,00 + R$ 50,00 por mês de manutenção.\n\nOlha o modelo funcionando aqui: https://biositesaisuperlimpo.netlify.app/\n\nQual é o seu negócio pra gente montar um desse pra você?`;
     } else if (q.includes('google') || q.includes('aparecer')) {
       if (q.includes('mano') || q.includes('bagulho')) {
         reply = `E aí, tudo tranquilo? Bora resolver isso! A gente faz a Gestão do Google Meu Negócio pra criar e cuidar do perfil da sua empresa e te colocar em destaque nas buscas.\n\nComo se chama você e qual é o seu negócio?`;
       } else {
         reply = `Boa! Com a Gestão de Google Meu Negócio a gente cria e cuida do perfil da sua empresa pra te dar destaque nas pesquisas do Google.\n\nMe conta, qual é o seu nome e qual é o ramo do seu negócio?`;
       }
-    } else if (q.includes('bio') || q.includes('vicente')) {
-      reply = `Show! O Biosite vem com atendimento 24h por um agente de IA que sabe tudo da sua empresa, por R$ 167,00 + R$ 50,00 por mês de manutenção.\n\nOlha o modelo funcionando aqui: https://vicenteiaguebiositegoogleia.vercel.app/\n\nQual é o seu negócio pra gente montar um desse pra você?`;
-    } else if (q.includes('avalia') || q.includes('nfc')) {
-      reply = `Boa pergunta! O AvaliaCard é um cartão com NFC e QR Code que leva seu cliente direto pra avaliação do Google da sua empresa, e sai por R$ 89,00 com frete grátis.\n\nVocê pode ver ele aqui: https://avaliacard.vercel.app/\n\nQuer garantir o seu com frete grátis?`;
     } else if (q.includes('tráfego') || q.includes('trafego') || q.includes('meta') || q.includes('anúncio') || q.includes('anuncio')) {
       reply = `Entendi! Na Gestão de Tráfego a gente cria campanhas no Meta Ads pra atrair clientes pro seu negócio, e o valor é a combinar conforme o tamanho do projeto.\n\nQuer que eu te passe o contato do nosso especialista no WhatsApp pra montar sua proposta?`;
     } else if (q === 'oi' || q === 'olá' || q === 'ola' || q.includes('bom dia') || q.includes('boa tarde') || q.includes('boa noite')) {

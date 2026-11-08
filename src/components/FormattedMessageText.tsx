@@ -55,8 +55,8 @@ export function extractUrlsFromText(text: string): { label: string; url: string;
       seen.add(clean);
       const isWa = clean.includes('wa.me') || clean.includes('whatsapp');
       let displayLabel = clean.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
-      if (clean.includes('vicenteiaguebiositegoogleia')) displayLabel = 'Modelo Biosite IA';
-      else if (clean.includes('avaliacard')) displayLabel = 'Avaliacard NFC';
+      if (clean.includes('biositesaisuperlimpo')) displayLabel = 'Modelo Biosite IA';
+      else if (clean.includes('avaliacard')) displayLabel = 'AvaliaCard Google';
       else if (clean.includes('startmktlocal')) displayLabel = 'Website Oficial';
       else if (isWa) displayLabel = 'WhatsApp Especialista';
 
