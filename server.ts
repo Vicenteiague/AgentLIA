@@ -1,6 +1,5 @@
 import express from 'express';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { GoogleGenAI, ThinkingLevel } from '@google/genai';
 import {
@@ -11,9 +10,6 @@ import {
 } from './src/utils/semanticIndexer.js';
 
 dotenv.config();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -1018,27 +1014,31 @@ apiRouter.post('/webhook-logs/clear', (req, res) => {
 
 // Mount API router:
 // 1. '/api' prefix: works with direct frontend fetch('/api/*')
-// 2. '/' prefix: works when Vercel rewrites /api/* to /api serverless function
+// 2. '/.netlify/functions/api' prefix: works with Netlify Functions
+// 3. '/' prefix: works when Vercel/Netlify rewrites /api/* to serverless function
 app.use('/api', apiRouter);
+app.use('/.netlify/functions/api', apiRouter);
 app.use(apiRouter);
 
-// Export Express app for Vercel Serverless Function and modular imports
+// Export Express app for Vercel/Netlify Serverless Function and modular imports
 export { app, apiRouter };
 export default app;
 
 // Setup Vite or Static File Serving (standalone dev / production server)
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
-    const { createServer: createViteServer } = await import('vite');
+    const vitePkg = 'vite';
+    const { createServer: createViteServer } = await import(vitePkg);
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
     });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static(path.resolve(__dirname, 'dist')));
+    const distDir = path.resolve(process.cwd(), 'dist');
+    app.use(express.static(distDir));
     app.get('*', (req, res) => {
-      res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+      res.sendFile(path.resolve(distDir, 'index.html'));
     });
   }
 
@@ -1048,6 +1048,11 @@ async function startServer() {
 }
 
 // Only launch TCP listener when running standalone (not inside Vercel or Netlify serverless environment)
-if (!process.env.VERCEL && !process.env.NETLIFY && process.env.NODE_ENV !== 'test') {
+if (
+  !process.env.VERCEL &&
+  !process.env.NETLIFY &&
+  !process.env.AWS_LAMBDA_FUNCTION_NAME &&
+  process.env.NODE_ENV !== 'test'
+) {
   startServer();
 }
