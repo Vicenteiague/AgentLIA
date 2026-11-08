@@ -48,7 +48,7 @@ export interface SemanticMatchResult {
 const STOP_WORDS = new Set([
   'a', 'o', 'as', 'os', 'um', 'uma', 'uns', 'umas',
   'de', 'da', 'do', 'das', 'dos', 'em', 'na', 'no', 'nas', 'nos',
-  'por', 'para', 'com', 'sem', 'sob', 'sobre', 'que', 'se',
+  'por', 'para', 'pra', 'pro', 'com', 'sem', 'sob', 'sobre', 'que', 'se',
   'e', 'ou', 'mas', 'como', 'me', 'te', 'lhe', 'nos', 'vos',
   'eu', 'voce', 'você', 'ele', 'ela', 'eles', 'elas',
   'muito', 'mais', 'menos', 'ja', 'já', 'favor', 'por favor',
@@ -79,7 +79,7 @@ export function extractKeywords(text: string): string[] {
 }
 
 /**
- * Builds the official baseline topics with full semantics, rich entities, and precise responses.
+ * Builds the official baseline topics with humanized WhatsApp tone and pure URLs.
  */
 function getBaselineTopics(cfg: BusinessConfig): SemanticTopic[] {
   const whatsappUrl = `https://wa.me/${cfg.businessPhone.replace(/\D/g, '') || '5567993174612'}`;
@@ -90,75 +90,70 @@ function getBaselineTopics(cfg: BusinessConfig): SemanticTopic[] {
       id: 'identidade_apresentacao',
       category: 'Identidade & Contato',
       title: 'Apresentação & Saudação da LIA',
-      summary: 'Saudação oficial, apresentação da LIA e propósito da Start Mkt Local.',
+      summary: 'Saudação humanizada da LIA e descoberta do nome e negócio do cliente.',
       keywords: [
         'oi', 'ola', 'bom dia', 'boa tarde', 'boa noite', 'tudo bem',
-        'quem e voce', 'quem e lia', 'start mkt', 'o que voces fazem',
-        'apresentacao', 'sobre a empresa', 'agencia de marketing', 'ponta pora',
+        'quem e voce', 'quem e lia', 'start mkt', 'apresentacao', 'sobre a empresa',
       ],
       entities: {
         'Agente': cfg.botName,
         'Empresa': cfg.companyName,
         'Papel': cfg.botRole,
-        'Localização': 'Ponta Porã - MS (atendemos todo o Brasil)',
+        'Localização': 'Ponta Porã (MS) - Atende todo o Brasil',
       },
-      directAnswer: `Olá! Eu sou a **${cfg.botName}**, especialista de atendimento e vendas da **${cfg.companyName}**.\n\nAjudamos empresas de todo o Brasil a venderem mais com Sites, Biosites com IA, Google Meu Negócio, Tráfego Pago e Agentes de WhatsApp.\n\nQual dessas soluções você gostaria de conhecer hoje?`,
+      directAnswer: `Oi! Tudo bem? 😊 Eu sou a ${cfg.botName}, da ${cfg.companyName}.\nPosso te ajudar com site, Google Meu Negócio, anúncios e mais.\nQual é o seu nome e o que você tá buscando pro seu negócio?`,
       suggestedQueries: [
-        'Olá, tudo bem?',
+        'Oi, tudo bem?',
         'Quem é você?',
-        'O que a Start Mkt Local faz?',
+        'Você é um robô?',
       ],
       priority: 85,
     },
     {
-      id: 'website_agencia',
-      category: 'Links Oficiais',
-      title: 'Website Oficial da Empresa',
-      summary: 'Link oficial do site da Start Mkt Local para apresentação institucional.',
+      id: 'pergunta_robo',
+      category: 'Identidade & Contato',
+      title: 'Pergunta se é Robô / Assistente Virtual',
+      summary: 'Transparência sobre ser a assistente virtual da Start Mkt Local e oferta de humano.',
       keywords: [
-        'site oficial', 'website oficial', 'qual o site', 'qual seu site', 'qual a pagina',
-        'site da agencia', 'site da empresa', 'site de voces', 'link do site', 'link da empresa',
-        'passa o site', 'manda o site', 'ver o site', 'endereco do site', 'startmktlocal',
+        'voce e um robo', 'voce e robo', 'e um robo', 'robo', 'inteligencia artificial',
+        'atendente de verdade', 'pessoa de verdade', 'assistente virtual', 'bot',
       ],
       entities: {
-        'Website': websiteUrl,
-        'Empresa': cfg.companyName,
+        'Identidade': `Assistente virtual da ${cfg.companyName}`,
+        'Especialista Humano': whatsappUrl,
       },
-      directAnswer: `O website oficial da **${cfg.companyName}** é: [${websiteUrl}](${websiteUrl}).\n\nLá você pode conferir nossos serviços, portfólio e diferenciais! Você também pode falar direto com nosso especialista no WhatsApp: [${whatsappUrl}](${whatsappUrl}).\n\nQual serviço da nossa agência você gostaria de conhecer melhor?`,
+      directAnswer: `Sou sim! Eu sou a assistente virtual aqui da ${cfg.companyName}, treinada pra te ajudar rapidinho pelo WhatsApp. 😊\n\nMas se você preferir falar direto com nosso especialista humano, eu te passo pra ele agora mesmo. Quer continuar comigo ou prefere falar com ele?`,
       suggestedQueries: [
-        'Qual o site de vocês?',
-        'Manda o link da agência',
-        'Onde vejo o site oficial?',
+        'Você é um robô?',
+        'Estou falando com uma IA?',
       ],
-      priority: 95,
+      priority: 94,
     },
     {
-      id: 'todos_os_links',
+      id: 'website_agencia',
       category: 'Links Oficiais',
-      title: 'Todos os Links Clicáveis Oficiais',
-      summary: 'Todos os links clicáveis (Site, WhatsApp, Biosite IA, AvaliaCard).',
+      title: 'Site Oficial da Start Mkt Local',
+      summary: 'Link oficial puro da agência Start Mkt Local.',
       keywords: [
-        'links', 'todos os links', 'links clicaveis', 'manda os links', 'passa os links',
-        'quais os links', 'canais oficiais', 'redes',
+        'site oficial', 'website oficial', 'qual o site da agencia', 'qual seu site',
+        'site da agencia', 'site da empresa', 'site de voces', 'link do site', 'startmktlocal',
       ],
       entities: {
         'Website': websiteUrl,
         'WhatsApp': whatsappUrl,
-        'Biosite': 'https://vicenteiaguebiositegoogleia.vercel.app/',
-        'AvaliaCard': 'https://avaliacard.vercel.app/',
       },
-      directAnswer: `Aqui estão todos os links oficiais da **${cfg.companyName}** clicáveis:\n\n🌐 **Website Oficial:**\n[${websiteUrl}](${websiteUrl})\n\n💬 **WhatsApp do Especialista:**\n[${whatsappUrl}](${whatsappUrl})\n\n📱 **Modelo Biosite IA:**\n[https://vicenteiaguebiositegoogleia.vercel.app/](https://vicenteiaguebiositegoogleia.vercel.app/)\n\n⭐ **Website Avaliacard NFC:**\n[https://avaliacard.vercel.app/](https://avaliacard.vercel.app/)\n\nQual deles você gostaria de conferir primeiro?`,
+      directAnswer: `Claro! O site oficial aqui da ${cfg.companyName} é esse aqui:\n${websiteUrl}\n\nMe conta, qual é o seu negócio e o que você quer melhorar hoje?`,
       suggestedQueries: [
-        'Quais são os links oficiais?',
-        'Me passa os links clicáveis',
+        'Qual o site de vocês?',
+        'Me passa o site da agência',
       ],
-      priority: 90,
+      priority: 95,
     },
     {
       id: 'atendimento_humano_whatsapp',
       category: 'Identidade & Contato',
       title: 'Atendimento Humano & WhatsApp Especialista',
-      summary: 'Handoff direto para falar com atendente ou consultor humano no WhatsApp.',
+      summary: 'Encaminhamento direto para o especialista humano no WhatsApp.',
       keywords: [
         'falar com alguem', 'falar com especialista', 'atendente', 'humano',
         'falar com humano', 'consultor', 'suporte', 'telefone', 'numero',
@@ -167,13 +162,12 @@ function getBaselineTopics(cfg: BusinessConfig): SemanticTopic[] {
       entities: {
         'Telefone': cfg.businessPhone,
         'WhatsApp': whatsappUrl,
-        'Horário': 'Seg a Sex: 08h às 18h | Sáb: 08h às 12h',
+        'Horário': 'Segunda a sexta, 08h às 18h | Sábado, 08h às 12h',
       },
-      directAnswer: `Com certeza! Vou te conectar direto com nosso especialista da **${cfg.companyName}**.\n\nClique no link para conversar agora no WhatsApp: [WhatsApp Especialista](${whatsappUrl}) ou ligue **${cfg.businessPhone}**.\n\nNosso atendimento funciona de Seg a Sex (08h às 18h) e Sáb (08h às 12h). Como posso adiantar seu atendimento?`,
+      directAnswer: `Beleza! Você pode chamar nosso especialista direto no WhatsApp por esse link:\n${whatsappUrl}\n\nNosso horário é de segunda a sexta das 08h às 18h e sábado das 08h às 12h. Qual é o seu nome pra eu já deixar avisado por aqui?`,
       suggestedQueries: [
-        'Quero falar com uma pessoa',
-        'Qual o WhatsApp do especialista?',
-        'Tem telefone para suporte?',
+        'Quero falar com especialista',
+        'Me passa o WhatsApp de atendimento',
       ],
       priority: 92,
       needsHumanHandoff: true,
@@ -181,229 +175,215 @@ function getBaselineTopics(cfg: BusinessConfig): SemanticTopic[] {
     {
       id: 'servico_criacao_sites',
       category: 'Catálogo & Preços',
-      title: 'Criação de Sites Profissionais',
-      summary: 'Desenvolvimento de sites rápidos, modernos e otimizados para conversão.',
+      title: 'Criação de Sites',
+      summary: 'Criação de sites para empresas em geral, entrega em 7 dias, a partir de R$ 500,00.',
       keywords: [
         'criacao de sites', 'criar site', 'fazer site', 'desenvolver site', 'landing page',
-        'site institucional', 'site profissional', 'site para minha empresa',
-        'quanto custa site', 'preco site', 'valor site', '500',
+        'quanto custa um site', 'quanto custa site', 'preco site', 'valor site', '500', 'prazo site',
       ],
       entities: {
-        'Valor': 'A partir de R$ 500,00',
+        'Para quem': 'Empresas em geral',
+        'Benefício': 'Destaque no meio digital',
         'Prazo': '7 dias',
-        'Indicação': 'Empresas em geral que buscam presença digital forte',
-        'Benefício': 'Destaque no meio digital e alta conversão',
+        'Valor': 'A partir de R$ 500,00',
       },
-      directAnswer: `Nosso serviço de **Criação de Sites** oferece:\n\n✨ **O que inclui:** Site moderno, ultra-rápido, responsivo (perfeito no celular) e pronto para destacar sua empresa no meio digital.\n⏱️ **Prazo de entrega:** 7 dias.\n💰 **Valor:** A partir de **R$ 500,00**.\n\nVocê já tem alguma ideia ou logotipo em mente para o site da sua empresa?`,
+      directAnswer: `Oi! Tudo bem? Aqui na ${cfg.companyName} os sites começam a partir de R$ 500,00 e ficam prontos em 7 dias.\n\nMe conta, qual é o seu negócio? Assim eu vejo o que faz mais sentido pra você.`,
       suggestedQueries: [
-        'Quanto custa para criar um site?',
-        'Qual o prazo para fazer um site?',
-        'O que inclui a criação de sites?',
+        'Oi, quanto custa um site?',
+        'Qual o prazo para criar um site?',
       ],
-      priority: 88,
+      priority: 90,
     },
     {
       id: 'servico_gmn',
       category: 'Catálogo & Preços',
-      title: 'Gestor Google Meu Negócio',
-      summary: 'Criação, otimização e gestão estratégica de perfis de empresas no Google.',
+      title: 'Gestão de Google Meu Negócio',
+      summary: 'Criação e gestão do perfil da empresa no Google para todo o Brasil.',
       keywords: [
         'google meu negocio', 'gmn', 'perfil do google', 'google maps', 'aparecer no google',
-        'otimizacao google', 'gestor de google', 'gerenciamento google', 'empresas no google',
+        'gestor de google', 'gerenciamento google', 'empresas no google', 'ficha do google',
       ],
       entities: {
-        'Valor': 'A combinar (conforme tamanho do negócio)',
-        'Indicação': 'Empresas de todo o Brasil que recebem clientes locais',
-        'O que inclui': 'Criação, verificação, otimização SEO local e gestão de avaliações',
+        'Para quem': 'Empresas de todo o Brasil',
+        'Inclui': 'Criação e gestão do perfil da empresa no Google',
+        'Valor': 'A combinar',
       },
-      directAnswer: `Com a **Gestão do Google Meu Negócio**, colocamos sua empresa no topo das pesquisas locais e do Google Maps quando clientes da sua região procurarem pelos seus serviços!\n\n📍 **O que inclui:** Criação, otimização de categorias, fotos, postagens e gestão contínua do perfil no Google.\n💰 **Valor:** R$ A combinar (condições especiais para pacotes).\n\nSua empresa já possui perfil no Google Maps ou começaremos do zero?`,
+      directAnswer: `Show! Com a Gestão de Google Meu Negócio a gente cria e cuida do perfil da sua empresa pra você se destacar nas buscas do Google.\n\nComo o valor é a combinar de acordo com o tamanho do projeto, me conta: qual é o ramo do seu negócio?`,
       suggestedQueries: [
         'Como funciona o Google Meu Negócio?',
-        'Quanto custa gerenciar o Google Meu Negócio?',
-        'Vocês colocam minha empresa no Google Maps?',
+        'Quero aparecer no Google',
       ],
-      priority: 87,
+      priority: 88,
     },
     {
       id: 'servico_biosite_ia',
       category: 'Catálogo & Preços',
-      title: 'Biosite com Atendimento Virtual de IA',
-      summary: 'Biosite interativo com agente de IA treinado atendendo 24 horas.',
+      title: 'Biosite com Atendimento Virtual',
+      summary: 'Biosite com atendimento 24h por agente de IA treinado para a empresa.',
       keywords: [
         'biosite', 'biosite ia', 'atendimento virtual', 'vicente iague', 'bio do instagram',
-        'link da bio', 'linktree', 'biosite com inteligencia artificial', '167', '50',
+        'link da bio', '167', '50', 'modelo de biosite',
       ],
       entities: {
-        'Valor': 'R$ 167,00 + R$ 50,00/mês de manutenção da IA',
-        'Modelo Exemplo': 'https://vicenteiaguebiositegoogleia.vercel.app/',
-        'Indicação': 'Empresas de todo o Brasil',
-        'Diferencial': 'Atendimento 24 horas tirando dúvidas e capturando leads',
+        'Valor': 'R$ 167,00 + R$ 50,00 por mês de manutenção do agente de IA',
+        'Modelo': 'https://vicenteiaguebiositegoogleia.vercel.app/',
+        'Inclui': 'Biosite com atendimento 24h por agente de IA treinado',
       },
-      directAnswer: `O **Biosite com Atendimento Virtual de IA** é ideal para o link da bio do Instagram e WhatsApp:\n\n🤖 **O que inclui:** Criação do Biosite moderno + agente de IA integrado atendendo seus clientes 24 horas por dia, tirando dúvidas instantaneamente!\n🔗 **Modelo de Demonstração:** [https://vicenteiaguebiositegoogleia.vercel.app/](https://vicenteiaguebiositegoogleia.vercel.app/)\n💰 **Valor:** R$ 167,00 + R$ 50,00/mês de manutenção da IA.\n\nQuer ver como ficaria com os dados da sua empresa?`,
+      directAnswer: `Boa! O Biosite vem com um agente de IA que atende seus clientes 24h sabendo tudo da sua empresa. O valor é R$ 167,00 + R$ 50,00 por mês de manutenção.\n\nOlha só um modelo funcionando na prática: https://vicenteiaguebiositegoogleia.vercel.app/\n\nO que você achou dessa ideia pro seu negócio?`,
       suggestedQueries: [
-        'Quanto custa o Biosite com IA?',
-        'Tem exemplo de Biosite funcionando?',
-        'O que é o Biosite com atendimento virtual?',
+        'Como funciona o Biosite com IA?',
+        'Tem modelo de Biosite pra ver?',
       ],
       priority: 89,
     },
     {
       id: 'servico_meta_ads',
       category: 'Catálogo & Preços',
-      title: 'Gestor de Tráfego Meta Ads (Instagram & Facebook)',
-      summary: 'Campanhas de anúncios estratégicos no Facebook e Instagram para atrair clientes.',
+      title: 'Gestão de Tráfego (Meta Ads)',
+      summary: 'Criação de campanhas de marketing no Meta Ads para empresas de todo o Brasil.',
       keywords: [
-        'meta ads', 'trafego pago', 'anuncios', 'anunciar no instagram', 'anunciar no facebook',
-        'campanhas', 'gestor de trafego', 'impulsionar', 'gerar leads', 'vender no instagram',
+        'meta ads', 'trafego pago', 'gestao de trafego', 'anuncios', 'anunciar no instagram',
+        'anunciar no facebook', 'campanhas', 'gestor de trafego',
       ],
       entities: {
-        'Valor': 'A combinar (planos personalizados)',
-        'Indicação': 'Empresas de todo o Brasil',
-        'O que inclui': 'Planejamento de criativos, segmentação de público qualificado e otimização de ROI',
+        'Para quem': 'Empresas de todo o Brasil',
+        'Inclui': 'Criação de campanhas de marketing no Meta Ads',
+        'Valor': 'A combinar',
       },
-      directAnswer: `Com nosso serviço de **Gestor de Tráfego Meta Ads**, nós criamos e gerenciamos campanhas de alta performance no Facebook e Instagram para levar clientes prontos para comprar diretamente ao seu WhatsApp!\n\n🎯 **O que inclui:** Segmentação de público local, criação de campanhas e otimização diária de resultados.\n💰 **Valor:** R$ A combinar.\n\nQual é o principal serviço ou produto que você quer divulgar agora?`,
+      directAnswer: `Show! Na Gestão de Tráfego a gente cria campanhas no Meta Ads pra atrair clientes certos pro seu negócio.\n\nO valor é a combinar porque depende do tamanho do projeto. Quer que eu chame nosso especialista no WhatsApp pra montar uma proposta pra você?`,
       suggestedQueries: [
-        'Vocês fazem anúncios no Instagram?',
-        'Como funciona a gestão de tráfego pago?',
-        'Quanto custa o Meta Ads?',
+        'Como funciona o tráfego pago no Meta Ads?',
+        'Vocês fazem anúncios?',
       ],
-      priority: 86,
+      priority: 87,
     },
     {
       id: 'servico_agente_ia_whatsapp',
       category: 'Catálogo & Preços',
-      title: 'Criação de Agente de IA para WhatsApp',
-      summary: 'Automação inteligente no WhatsApp com respostas humanizadas e agendamento.',
+      title: 'Agente de IA para WhatsApp',
+      summary: 'Agente de IA no WhatsApp da empresa responsável pelo atendimento.',
       keywords: [
-        'agente ia whatsapp', 'bot whatsapp', 'inteligencia artificial whatsapp',
-        'robo de whatsapp', 'atendimento automatico', 'ia para whatsapp',
-        'agente virtual', 'automacao de mensagens', 'chatbot whatsapp',
+        'agente de ia', 'agente ia whatsapp', 'ia para whatsapp', 'ia no whatsapp',
+        'atendimento no whatsapp', 'chatbot whatsapp',
       ],
       entities: {
-        'Valor': 'R$ A combinar',
-        'Indicação': 'Empresas de todo o Brasil que recebem muitas mensagens',
-        'O que inclui': 'Agente treinado com conhecimento total do negócio, áudio e integração',
+        'Para quem': 'Empresas de todo o Brasil',
+        'Inclui': 'Agente de IA no WhatsApp com conhecimento total do negócio',
+        'Valor': 'A combinar',
       },
-      directAnswer: `Criamos **Agentes de IA Personalizados para Atendimento no WhatsApp** da sua empresa!\n\n🚀 **Diferencial:** Não é um robô travado de botões! A IA responde como uma atendente humana experiente, conhece todo o catálogo, esclarece dúvidas e encaminha para fechamento.\n💰 **Valor:** R$ A combinar.\n\nQuantas mensagens você costuma receber por dia no seu WhatsApp?`,
+      directAnswer: `Boa escolha! A gente coloca um Agente de IA direto no WhatsApp da sua empresa, sabendo tudo do seu negócio pra atender seus clientes.\n\nComo o valor depende do tamanho do projeto, quer que eu te passe o contato do nosso especialista pra montar sua proposta?`,
       suggestedQueries: [
-        'Vocês criam inteligência artificial para WhatsApp?',
-        'Como funciona o bot de IA para empresas?',
-        'O agente de IA consegue responder áudio e dúvidas?',
+        'Como funciona o Agente de IA para WhatsApp?',
+        'Quanto custa o Agente de IA no WhatsApp?',
       ],
-      priority: 89,
+      priority: 88,
     },
     {
       id: 'servico_avaliacard_nfc',
       category: 'Catálogo & Preços',
-      title: 'AvaliaCard NFC & QR Code Google 5 Estrelas',
-      summary: 'Cartão físico com tecnologia NFC e QR Code para avaliações rápidas no balcão.',
+      title: 'AvaliaCard (Cartão NFC e QR Code Google)',
+      summary: 'Cartão NFC e QR Code com link direto para avaliação do Google por R$ 89,00 com frete grátis.',
       keywords: [
-        'avaliacard', 'cartao nfc', 'avaliacao google', 'avaliar no balcao', 'nfc',
-        'qr code google', 'cartao de aproximacao', '5 estrelas google', '89', 'frete gratis',
+        'avaliacard', 'cartao nfc', 'avaliacao google', 'nfc',
+        'qr code google', 'cartao de avaliacao', '89', 'frete gratis',
       ],
       entities: {
-        'Valor': 'R$ 89,00 + Frete Grátis',
-        'Website Oficial': 'https://avaliacard.vercel.app/',
-        'Indicação': 'Comércios, clínicas, restaurantes e balcões em geral',
-        'Como funciona': 'O cliente aproxima o celular no cartão NFC e a página de 5 estrelas abre na hora',
+        'Inclui': 'Cartão NFC e QR Code com link direto para avaliação do Google',
+        'Valor': 'R$ 89,00 com frete grátis',
+        'Site': 'https://avaliacard.vercel.app/',
       },
-      directAnswer: `O **AvaliaCard NFC** é o jeito mais rápido de multiplicar suas avaliações 5 estrelas no Google!\n\n⭐ **Como funciona:** O cliente aproxima o celular do cartão físico no seu balcão e a tela de avaliação do Google abre na mesma hora.\n🚚 **Valor:** Apenas **R$ 89,00 com Frete Grátis** para todo o Brasil!\n🌐 **Saiba mais e peça o seu:** [https://avaliacard.vercel.app/](https://avaliacard.vercel.app/)\n\nQuer que eu reserve um AvaliaCard com a marca da sua empresa?`,
+      directAnswer: `Show! O AvaliaCard é um cartão com NFC e QR Code que leva seu cliente direto pra página de avaliação do Google da sua empresa. Ele custa R$ 89,00 com frete grátis pra todo o Brasil!\n\nVocê pode ver todos os detalhes aqui: https://avaliacard.vercel.app/\n\nQuer pedir o seu agora?`,
       suggestedQueries: [
-        'O que é o AvaliaCard?',
-        'Quanto custa o cartão NFC?',
-        'O frete do AvaliaCard é grátis?',
+        'Quanto custa o AvaliaCard?',
+        'Como funciona o cartão NFC do Google?',
       ],
       priority: 91,
     },
     {
       id: 'faq_desconto_pagamento',
       category: 'FAQ & Objeções',
-      title: 'Desconto & Formas de Pagamento',
-      summary: '5% de desconto no PIX e parcelamento no cartão em até 3x sem juros.',
+      title: 'Objeção: Desconto & PIX',
+      summary: '5% de desconto no PIX na hora, cartão até 3x sem juros e condição especial para pacotes.',
       keywords: [
-        'desconto', 'pix', 'parcelar', 'cartao de credito', 'parcelamento',
-        'formas de pagamento', 'como pagar', 'sem juros', 'desconto se fechar hoje',
+        'desconto', 'tem desconto', 'desconto no pix', 'pix', 'parcelar',
+        'cartao de credito', 'parcelamento', 'formas de pagamento', 'como pagar', 'sem juros',
       ],
       entities: {
-        'Desconto PIX': '5% de desconto imediato',
-        'Cartão': 'Até 3x sem juros',
-        'Débito': 'Aceito',
+        'PIX': '5% de desconto na hora',
+        'Cartão de Crédito': 'Até 3x sem juros',
+        'Cartão de Débito': 'Aceito',
       },
-      directAnswer: `No pagamento via **PIX já aplicamos 5% de desconto imediato**! 💰\n\nTambém parcelamos no cartão de crédito em até **3x sem juros** ou aceitamos débito. Se você quiser fechar um pacote com mais de um serviço, posso chamar nosso especialista no WhatsApp para liberar uma condição exclusiva!\n\nQual forma de pagamento é mais confortável para você?`,
+      directAnswer: `No PIX já te dou 5% de desconto na hora! Se quiser fechar mais de um serviço, posso chamar nosso especialista no WhatsApp pra liberar uma condição especial. Quer que eu te passe o contato?`,
       suggestedQueries: [
-        'Vocês dão desconto no PIX?',
-        'Quais as formas de pagamento?',
-        'Dá para parcelar no cartão?',
+        'Tem desconto no PIX?',
+        'Quais são as formas de pagamento?',
       ],
-      priority: 85,
+      priority: 92,
     },
     {
       id: 'faq_garantia',
       category: 'FAQ & Objeções',
-      title: 'Garantia de 15 Dias',
-      summary: 'Garantia total de 15 dias sem burocracia para tranquilidade do cliente.',
+      title: 'Objeção: Garantia de 15 Dias',
+      summary: '15 dias de garantia total sem burocracia.',
       keywords: [
-        'garantia', 'e seguro', 'se eu nao gostar', 'prazo de garantia',
-        'politica de garantia', 'reembolso', 'confiavel',
+        'garantia', 'tem garantia', 'qual a garantia', 'e seguro', 'se nao ficar bom',
       ],
       entities: {
-        'Prazo de Garantia': '15 dias de garantia total',
-        'Política': 'Resolução rápida sem burocracia',
+        'Garantia': '15 dias de garantia total',
       },
-      directAnswer: `Você conta com **15 dias de garantia total**! Se tiver qualquer dúvida ou ajuste necessário, resolvemos de imediato sem nenhuma burocracia para garantir 100% da sua satisfação.\n\nPodemos dar o primeiro passo no seu projeto hoje?`,
+      directAnswer: `Você tem 15 dias de garantia total. Se qualquer coisa não ficar como combinado, a gente resolve sem burocracia. Quer seguir com a gente?`,
       suggestedQueries: [
-        'Como funciona a garantia?',
-        'Tenho garantia se contratar?',
+        'Qual é a garantia?',
+        'Tem garantia se eu contratar?',
       ],
-      priority: 84,
+      priority: 90,
     },
     {
       id: 'faq_valor_alto',
       category: 'FAQ & Objeções',
-      title: 'Objeção: Achei Caro / Vou Pensar',
-      summary: 'Enfatiza retorno sobre investimento, economia de tempo e opção de parcelamento.',
+      title: 'Objeção: Valor Alto / Vou Pensar',
+      summary: 'Quebra de objeção sobre preço alto ou indecisão, oferecendo parcelamento em 3x sem juros.',
       keywords: [
         'achei caro', 'ta caro', 'vou pensar', 'valor alto', 'muito caro',
         'depois eu vejo', 'orcamento apertado',
       ],
       entities: {
-        'Argumento': 'Soluções de alto rendimento que geram retorno financeiro rápido',
-        'Flexibilidade': 'Parcelamento em até 3x sem juros',
+        'Parcelamento': 'Até 3x sem juros no cartão',
+        'Desconto': '5% no PIX',
       },
-      directAnswer: `Entendo perfeitamente! Mas vale lembrar que todas as nossas ferramentas foram pensadas para trazer clientes pagantes e economizar horas do seu dia, se pagando logo no primeiro mês.\n\nQuer que eu simule as opções de parcelamento sem juros para caber com folga no seu orçamento?`,
+      directAnswer: `Entendo total! Só lembro que nossos serviços são feitos pra turbinar negócios locais e te ajudar a vender mais.\n\nPosso te mostrar o parcelamento em até 3x sem juros pra caber no seu orçamento?`,
       suggestedQueries: [
-        'Achei o valor alto',
-        'Vou pensar e te aviso',
+        'Achei caro, vou pensar.',
+        'Dá pra parcelar?',
       ],
-      priority: 83,
+      priority: 93,
     },
     {
-      id: 'integracoes_google',
-      category: 'Integrações Google',
-      title: 'Integrações Google (Agenda & Sheets)',
-      summary: 'Agendamento sincronizado no Google Calendar e registro automático de leads no Google Sheets.',
+      id: 'guardrail_fora_escopo',
+      category: 'Políticas & Guardrails',
+      title: 'Fora do Escopo / Encaminhamento ao Especialista',
+      summary: 'Regra inegociável para perguntas fora da base de conhecimento.',
       keywords: [
-        'google agenda', 'calendar', 'agendamento', 'agendar reuniao', 'planilha',
-        'google sheets', 'sincronizar leads', 'drive', 'integracao google',
+        'logomarca', 'logo', 'identidade visual', 'cartao de visita', 'panfleto',
+        'hospedagem', 'dominio', 'tiktok', 'youtube', 'email marketing', 'prazo do meta ads',
       ],
       entities: {
-        'Google Agenda': 'Agendamento direto de apresentações e reuniões',
-        'Google Sheets': 'Gravação automática de contatos e leads',
-        'Acesso': 'Disponível na aba Google Workspace do aplicativo',
+        'Regra': 'Nunca inventar preços, prazos ou serviços fora do documento',
+        'Contato': whatsappUrl,
       },
-      directAnswer: `Sim! Temos integração completa com as ferramentas do Google Workspace:\n\n📅 **Google Agenda:** Agendamos reuniões e apresentações diretamente na sua Google Agenda.\n📊 **Google Sheets:** Todos os novos leads e contatos são salvos automaticamente em planilhas compartilhadas no Google Drive.\n\nVocê gostaria de agendar uma demonstração rápida com nosso especialista para esta semana?`,
+      directAnswer: `Para te confirmar esse detalhe específico sem erro, vou te passar o contato direto do nosso especialista: ${whatsappUrl}`,
       suggestedQueries: [
-        'Vocês integram com Google Agenda?',
-        'Os contatos vão para o Google Sheets?',
-        'Como funciona o agendamento de reuniões?',
+        'Vocês fazem logomarca?',
+        'Qual o prazo do Meta Ads?',
       ],
-      priority: 85,
+      priority: 96,
+      needsHumanHandoff: true,
     },
   ];
 }
 
 /**
- * Parses user-provided knowledge base text (Markdown or plain text) into structured semantic topics.
+ * Parses user-provided knowledge base text into structured semantic topics.
  */
 export function buildSemanticIndex(rawText: string, config: BusinessConfig): SemanticIndex {
   const baseTopics = getBaselineTopics(config);
@@ -412,7 +392,6 @@ export function buildSemanticIndex(rawText: string, config: BusinessConfig): Sem
   const topicsMap = new Map<string, SemanticTopic>();
   baseTopics.forEach((t) => topicsMap.set(t.id, t));
 
-  // If text has custom content or differs from standard, parse dynamically
   if (text.trim()) {
     const sections = text.split(/(?=\n#+\s+)/g);
 
@@ -422,11 +401,10 @@ export function buildSemanticIndex(rawText: string, config: BusinessConfig): Sem
 
       const headerMatch = trimmed.match(/^#+\s+(.+)$/m);
       const title = headerMatch ? headerMatch[1].replace(/^[0-9.]+\s*/, '').trim() : `Seção ${idx + 1}`;
-      
-      // Determine category
+
       let category: SemanticTopic['category'] = 'Tópicos Personalizados';
       const lowTitle = title.toLowerCase();
-      if (lowTitle.includes('identidade') || lowTitle.includes('contato') || lowTitle.includes('quem somos')) {
+      if (lowTitle.includes('identidade') || lowTitle.includes('contato') || lowTitle.includes('dados') || lowTitle.includes('robô') || lowTitle.includes('robo')) {
         category = 'Identidade & Contato';
       } else if (lowTitle.includes('produto') || lowTitle.includes('serviço') || lowTitle.includes('catalogo') || lowTitle.includes('preço')) {
         category = 'Catálogo & Preços';
@@ -436,11 +414,10 @@ export function buildSemanticIndex(rawText: string, config: BusinessConfig): Sem
         category = 'Links Oficiais';
       } else if (lowTitle.includes('google') || lowTitle.includes('agenda') || lowTitle.includes('planilha')) {
         category = 'Integrações Google';
-      } else if (lowTitle.includes('regra') || lowTitle.includes('guardrail') || lowTitle.includes('diretriz')) {
+      } else if (lowTitle.includes('regra') || lowTitle.includes('guardrail') || lowTitle.includes('fala') || lowTitle.includes('fluxo')) {
         category = 'Políticas & Guardrails';
       }
 
-      // Extract key-value entities like "- **Preço:** R$ 100" or "Valor: R$ 50"
       const entities: Record<string, string> = {};
       const entityRegex = /[-*]?\s*(?:\*\*)?([A-Za-zÀ-ÿ0-9\s/]+?)(?:\*\*)?:\s*([^\n\r]+)/g;
       let eMatch;
@@ -452,13 +429,9 @@ export function buildSemanticIndex(rawText: string, config: BusinessConfig): Sem
         }
       }
 
-      // Extract keywords
       const textKeywords = extractKeywords(`${title} ${trimmed}`);
-
-      // Build custom topic if significant content
       const slugId = `custom_sec_${idx}_${normalizeSemanticText(title).replace(/\s+/g, '_').slice(0, 24)}`;
-      
-      // Check if it should enrich or complement existing baseline
+
       const existing = Array.from(topicsMap.values()).find(
         (t) => normalizeSemanticText(t.title) === normalizeSemanticText(title)
       );
@@ -467,11 +440,10 @@ export function buildSemanticIndex(rawText: string, config: BusinessConfig): Sem
         existing.keywords = Array.from(new Set([...existing.keywords, ...textKeywords]));
         existing.entities = { ...existing.entities, ...entities };
       } else if (trimmed.length > 40) {
-        // Create concise direct answer from the section
         const lines = trimmed
           .split('\n')
           .filter((l) => !l.startsWith('#') && l.trim().length > 0)
-          .slice(0, 5)
+          .slice(0, 4)
           .join('\n');
 
         topicsMap.set(slugId, {
@@ -481,8 +453,8 @@ export function buildSemanticIndex(rawText: string, config: BusinessConfig): Sem
           summary: lines.slice(0, 120) + (lines.length > 120 ? '...' : ''),
           keywords: textKeywords,
           entities,
-          directAnswer: `Olá! Sobre **${title}**:\n\n${lines}\n\nPosso te ajudar com mais algum detalhe sobre isso?`,
-          suggestedQueries: [`Sobre ${title}`, `Informações de ${title}`],
+          directAnswer: `${lines}\n\nComo posso te ajudar com isso no seu negócio?`,
+          suggestedQueries: [`Sobre ${title}`],
           priority: 70,
         });
       }
@@ -493,7 +465,6 @@ export function buildSemanticIndex(rawText: string, config: BusinessConfig): Sem
   const totalKeywords = topicsList.reduce((acc, t) => acc + t.keywords.length, 0);
   const categories = Array.from(new Set(topicsList.map((t) => t.category)));
 
-  // Generate a simple hash to track modifications
   let hashVal = 0;
   for (let i = 0; i < text.length; i++) {
     hashVal = (hashVal << 5) - hashVal + text.charCodeAt(i);
@@ -510,8 +481,7 @@ export function buildSemanticIndex(rawText: string, config: BusinessConfig): Sem
 }
 
 /**
- * High-performance semantic matcher (<5ms). Computes token overlap, exact phrase match,
- * intent priority, and returns the highest-scoring candidate.
+ * High-performance semantic matcher (<5ms).
  */
 export function matchSemanticQuery(
   rawQuery: string,
@@ -530,7 +500,7 @@ export function matchSemanticQuery(
       topic: null,
       matchedKeywords: [],
       matchedIntent: 'Nenhuma entrada detectada',
-      reply: 'Como posso te ajudar hoje?',
+      reply: 'Oi! Tudo bem? Qual é o seu nome e o que você tá buscando pro seu negócio?',
       needsHumanHandoff: false,
       executionTimeMs: Math.round(performance.now() - startTime),
     };
@@ -544,7 +514,6 @@ export function matchSemanticQuery(
     let score = 0;
     const currentMatchedKw: string[] = [];
 
-    // 1. Exact phrase match in keywords (Massive Boost)
     for (const kw of topic.keywords) {
       const normKw = normalizeSemanticText(kw);
       if (normQuery === normKw) {
@@ -556,7 +525,6 @@ export function matchSemanticQuery(
       }
     }
 
-    // 2. Token overlap against topic keywords
     let tokenOverlapCount = 0;
     const topicNormKeywords = topic.keywords.map(normalizeSemanticText);
 
@@ -572,7 +540,6 @@ export function matchSemanticQuery(
       score += overlapRatio * 40;
     }
 
-    // 3. Entity key-value matching
     for (const [key, val] of Object.entries(topic.entities)) {
       const normK = normalizeSemanticText(key);
       const normV = normalizeSemanticText(val);
@@ -582,13 +549,11 @@ export function matchSemanticQuery(
       }
     }
 
-    // 4. Topic Title relevance
     const normTitle = normalizeSemanticText(topic.title);
     if (normQuery.includes(normTitle)) {
       score += 35;
     }
 
-    // Priority tie-breaker
     score += (topic.priority || 50) * 0.1;
 
     if (score > bestScore) {
@@ -599,7 +564,6 @@ export function matchSemanticQuery(
   }
 
   const duration = Math.round((performance.now() - startTime) * 100) / 100;
-  // Normalized confidence percentage capped at 100
   const confidence = Math.min(100, Math.round((bestScore / 110) * 100));
 
   if (bestTopic && confidence >= 35) {
@@ -615,7 +579,6 @@ export function matchSemanticQuery(
     };
   }
 
-  // Fallback for general queries without strict semantic index lock
   const defaultWhatsApp = config?.businessPhone
     ? `https://wa.me/${config.businessPhone.replace(/\D/g, '')}`
     : 'https://wa.me/5567993174612';
@@ -625,9 +588,9 @@ export function matchSemanticQuery(
     confidence: confidence,
     topic: bestTopic,
     matchedKeywords: bestMatchedKeywords,
-    matchedIntent: 'Consulta Geral / Sem correspondência direta',
-    reply: `Entendi sua dúvida! Para te passar as informações detalhadas e personalizadas para a sua empresa, vou te conectar com nosso especialista no WhatsApp:\n\n👉 [Falar com Especialista Start Mkt Local](${defaultWhatsApp})\n\nOu me diga se prefere saber sobre **Sites**, **Google Meu Negócio**, **Biosite IA** ou **AvaliaCard NFC**!`,
-    needsHumanHandoff: false,
+    matchedIntent: 'Fora do Escopo / Encaminhamento ao Especialista',
+    reply: `Para te confirmar esse detalhe específico sem erro, vou te passar o contato direto do nosso especialista: ${defaultWhatsApp}`,
+    needsHumanHandoff: true,
     executionTimeMs: duration,
   };
 }

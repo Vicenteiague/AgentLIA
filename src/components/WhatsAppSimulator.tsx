@@ -32,7 +32,7 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
     {
       id: 'wa-msg-1',
       role: 'assistant',
-      text: `Olá! Eu sou a ${config.botName}, especialista de atendimento e vendas da **${config.companyName}**. Estou aqui para tirar dúvidas sobre nossos serviços de Marketing Digital e alavancar suas vendas. Como posso te ajudar hoje?`,
+      text: `Oi! Tudo bem? 😊 Eu sou a ${config.botName}, da ${config.companyName}.\nPosso te ajudar com site, Google Meu Negócio, anúncios e mais.\nQual é o seu nome e o que você tá buscando pro seu negócio?`,
       timestamp: '08:35',
       status: 'read',
     },
@@ -160,7 +160,7 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
     setIsLoading(true);
 
     try {
-      const history = messages.slice(-6).map((m) => ({
+      const history = messages.slice(-10).map((m) => ({
         role: m.role as 'user' | 'assistant',
         text: m.text,
       }));
@@ -248,7 +248,7 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
                   {
                     id: `wa-init-${Date.now()}`,
                     role: 'assistant',
-                    text: `Olá! Eu sou a ${config.botName}, especialista de atendimento e vendas da **${config.companyName}**. Como posso ajudar?`,
+                    text: `Oi! Tudo bem? 😊 Eu sou a ${config.botName}, da ${config.companyName}.\nPosso te ajudar com site, Google Meu Negócio, anúncios e mais.\nQual é o seu nome e o que você tá buscando pro seu negócio?`,
                     timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
                     status: 'read',
                   },

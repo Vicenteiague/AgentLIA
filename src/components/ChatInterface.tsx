@@ -39,7 +39,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     {
       id: 'msg-init-1',
       role: 'assistant',
-      text: `Olá! Eu sou a ${config.botName}, especialista de atendimento e vendas da **${config.companyName}**. Estou aqui para tirar dúvidas sobre nosso catálogo de serviços e te ajudar a escolher a melhor solução para sua empresa. Como posso te ajudar hoje?`,
+      text: `Oi! Tudo bem? 😊 Eu sou a ${config.botName}, da ${config.companyName}.\nPosso te ajudar com site, Google Meu Negócio, anúncios e mais.\nQual é o seu nome e o que você tá buscando pro seu negócio?`,
       timestamp: '08:35',
       status: 'read',
     },
@@ -177,7 +177,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       // Build history for context
       const history = messages
         .filter((m) => m.role === 'user' || m.role === 'assistant')
-        .slice(-6)
+        .slice(-10)
         .map((m) => ({
           role: m.role as 'user' | 'assistant',
           text: m.text,
@@ -216,7 +216,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       {
         id: `init-${Date.now()}`,
         role: 'assistant',
-        text: `Olá! Eu sou a ${config.botName}, especialista de atendimento e vendas da **${config.companyName}**. Como posso ajudar você hoje?`,
+        text: `Oi! Tudo bem? 😊 Eu sou a ${config.botName}, da ${config.companyName}.\nPosso te ajudar com site, Google Meu Negócio, anúncios e mais.\nQual é o seu nome e o que você tá buscando pro seu negócio?`,
         timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
         status: 'read',
       },

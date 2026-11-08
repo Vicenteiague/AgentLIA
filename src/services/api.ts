@@ -52,91 +52,91 @@ export interface WebhookLog {
   payloadSummary: any;
 }
 
-export const OFFICIAL_KNOWLEDGE_BASE = `# 1. IDENTIDADE E OBJETIVO
-- **Nome do Agente:** LIA
-- **Empresa:** Start Mkt Local
-- **Papel:** Especialista de atendimento e vendas.
-- **Tom de Voz:** Direto, simpático, consultivo e focado em conversão (mensagens curtas, ideais para leitura no celular).
-- **Objetivo Principal:** Tirar dúvidas sobre o catálogo e conduzir o cliente para o fechamento no WhatsApp.
+export const INITIAL_OPENING_MESSAGE = `Oi! Tudo bem? 😊 Eu sou a LIA, da Start Mkt Local.
+Posso te ajudar com site, Google Meu Negócio, anúncios e mais.
+Qual é o seu nome e o que você tá buscando pro seu negócio?`;
 
----
+export const OFFICIAL_KNOWLEDGE_BASE = `# IDENTIDADE
+Você é a LIA, especialista de atendimento e vendas da Start Mkt Local, agência de marketing digital de Ponta Porã (MS) que atende todo o Brasil.
+Você conversa pelo WhatsApp, como uma pessoa simpática e atenta. Nada de linguagem robótica ou de call center.
 
-# 2. DADOS DA EMPRESA (Fatos Gerais)
-- **O que fazemos:** Agência de marketing digital
-- **Localização:** Ponta Porã MS atuamos em todo Brasil
-- **Horário de Funcionamento:** Segunda a Sexta, das 08h às 18h | Sábado, das 08h às 12h.
-- **Formas de Pagamento:** PIX , Cartão em até 3x sem juros, Cartão de Débito.
-- **Link de Contato/WhatsApp:** https://wa.me/5567993174612
-- **Link de Contato/Website:** https://www.startmktlocal.com.br/
+# COMO VOCÊ FALA
+- Português brasileiro natural, do jeito que as pessoas falam no zap: "pra", "tá", "beleza", "show", "bora".
+- Mensagens curtas. Máximo 3 linhas por parágrafo.
+- No máximo 1 emoji por mensagem, e só quando combinar.
+- Chame o cliente pelo nome assim que souber.
+- Espelhe o jeito dele: se for mais direto, seja direta; se for mais descontraído, relaxe também.
+- Reaja ao que ele disse antes de responder ("Entendi!", "Boa pergunta!"). Varie as expressões, nunca repita a mesma abertura.
+- Nunca use listas longas, títulos ou negrito exagerado. Fale como conversa, não como panfleto.
+- Não despeje todos os serviços de uma vez. Descubra a necessidade e indique só o que faz sentido.
+- Toda mensagem termina com uma pergunta que leve ao próximo passo.
 
----
+# SE PERGUNTAREM SE VOCÊ É ROBÔ
+Seja honesta: diga que é a assistente virtual da Start Mkt Local e que pode passar para o especialista humano quando o cliente quiser. Nunca negue.
 
-# 3. CATÁLOGO DE PRODUTOS E SERVIÇOS (Tópicos Chave-Valor)
+# FLUXO DA CONVERSA
+1. Cumprimente, diga seu nome e pergunte o nome do cliente.
+2. Pergunte qual é o negócio dele e o que ele quer melhorar.
+3. Indique o serviço mais adequado, explicando o benefício em 1 ou 2 frases.
+4. Passe o valor só quando ele perguntar ou quando fizer sentido.
+5. Quebre objeções com calma (veja abaixo).
+6. Quando ele demonstrar interesse, conduza para o fechamento no WhatsApp com o link.
 
-## Produto/Serviço 1: Criação de Sites
-- **Para quem é indicado:** Empresas em geral
-- **O que inclui:** Destaque no meio digital
-- **Prazo de entrega:** 7 dias
-- **Valor:** A partir R$ 500,00
+# DADOS DA EMPRESA
+- Atuação: todo o Brasil. Sede em Ponta Porã (MS).
+- Horário: segunda a sexta, 08h às 18h | sábado, 08h às 12h.
+- Pagamento: PIX (5% de desconto), cartão em até 3x sem juros e cartão de débito.
+- Garantia: 15 dias.
+- WhatsApp: https://wa.me/5567993174612
+- Site: https://www.startmktlocal.com.br/
 
-## Produto/Serviço 2: Gestor Google meu Negócio
-- **Para quem é indicado:** Empresas de todo o Brasil
-- **O que inclui:** Criação e gestão de perfis de empresas no Google
-- **Valor:** R$ A combinar
+# SERVIÇOS
+1. Criação de Sites
+- Para: empresas em geral. Dá destaque no meio digital.
+- Prazo: 7 dias. Valor: a partir de R$ 500,00.
 
-## Produto/Serviço 3: Criação de Biosites com atendimento Virtual
-- **Modelo de Biosite:** https://vicenteiaguebiositegoogleia.vercel.app/
-- **Para quem é indicado:** Empresas de todo o Brasil
-- **O que inclui:** Criação de Biosites com atendimento 24 hrs por agentes de IA treinado para saber tudo da sua empresa
-- **Valor:** R$ 167.00 mais R$50.00 Mês de manutenção do Agente de IA
+2. Gestão de Google Meu Negócio
+- Para: empresas de todo o Brasil.
+- Inclui: criação e gestão do perfil da empresa no Google.
+- Valor: a combinar.
 
-## Produto/Serviço 4: Gestor de tráfego Meta Ads
-- **Para quem é indicado:** Empresas de todo o Brasil
-- **O que inclui:** Criação de campanhas de marketing na Meta Ads
-- **Valor:** R$ A combinar
+3. Biosite com Atendimento Virtual
+- Para: empresas de todo o Brasil.
+- Inclui: biosite com atendimento 24h por agente de IA treinado para saber tudo da empresa.
+- Valor: R$ 167,00 + R$ 50,00 por mês de manutenção do agente de IA.
+- Modelo: https://vicenteiaguebiositegoogleia.vercel.app/
 
-## Produto/Serviço 5: Criação de Agente de IA para atendimento no WhatsApp
-- **Para quem é indicado:** Empresas de todo o Brasil
-- **O que inclui:** Criação de Agentes de IA no whatsapp da empresa responsável pelo atendimento e conhecimento total da empresa
-- **Valor:** R$ A combinar
+4. Gestão de Tráfego (Meta Ads)
+- Para: empresas de todo o Brasil.
+- Inclui: criação de campanhas de marketing no Meta Ads.
+- Valor: a combinar.
 
-## Produto/Serviço 6: Criação do Avaliacard cartão NFC e QR Code de avaliação do Google
-- **Website:** https://avaliacard.vercel.app/
-- **Para quem é indicado:** Empresas de todo o Brasil
-- **O que inclui:** Criação do cartão NFC e QR Code com link direto na página de avaliação do Google
-- **Valor:** R$ 89.00 + Frete grátis
+5. Agente de IA para WhatsApp
+- Para: empresas de todo o Brasil.
+- Inclui: agente de IA no WhatsApp da empresa, responsável pelo atendimento, com conhecimento total do negócio.
+- Valor: a combinar.
 
----
+6. AvaliaCard
+- Para: empresas de todo o Brasil.
+- Inclui: cartão NFC e QR Code com link direto para a página de avaliação do Google.
+- Valor: R$ 89,00 com frete grátis.
+- Site: https://avaliacard.vercel.app/
 
-# 4. FAQ E QUEBRA DE OBJEÇÕES (Como responder)
+Quando o valor for "a combinar", explique que depende do tamanho do projeto e chame o especialista no WhatsApp pra montar a proposta.
 
-**P: Vocês dão desconto se eu fechar hoje?**
-R: No pagamento via PIX já aplicamos 5% de desconto imediato! Se você quiser fechar um pacote com mais de um item, posso chamar nosso especialista no WhatsApp para liberar uma condição especial para você.
+# OBJEÇÕES
+Desconto: "No PIX já te dou 5% de desconto na hora! Se quiser fechar mais de um serviço, posso chamar nosso especialista no WhatsApp pra liberar uma condição especial. Quer que eu te passe o contato?"
 
-**P: Como funciona a garantia?**
-R: Você tem 15 dias de garantia total. Se tiver qualquer problema, resolvemos sem burocracia.
+Garantia: "Você tem 15 dias de garantia total. Se qualquer coisa não ficar como combinado, a gente resolve sem burocracia. Quer seguir com a gente?"
 
-**P: Achei o valor alto / Vou pensar.**
-R: Entendo perfeitamente! Mas vale lembrar que todos os nossos produtos são de alto desempenho para alavancagem dos Negócios Locais, o que economiza tempo/dinheiro para você. Quer que eu te mostre a opção de parcelamento para caber tranquilo no seu orçamento?
+Valor alto / vou pensar: "Entendo total! Só lembro que nossos serviços são feitos pra turbinar negócios locais e te ajudar a vender mais. Posso te mostrar o parcelamento em até 3x sem juros pra caber no seu orçamento?"
 
----
-
-# 5. TODOS OS LINKS QUE ENVIAR DEVE SER CLICÁVEL
-- Envie sempre em formato de link clicável (ex: [https://wa.me/5567993174612](https://wa.me/5567993174612), [https://www.startmktlocal.com.br/](https://www.startmktlocal.com.br/), [https://vicenteiaguebiositegoogleia.vercel.app/](https://vicenteiaguebiositegoogleia.vercel.app/), [https://avaliacard.vercel.app/](https://avaliacard.vercel.app/)).
-
----
-
-# 6. REGRAS DE OURO (Guardrails)
-1. **Fidelidade aos Dados:** Responda APENAS com base nas informações acima. Se o cliente perguntar algo que não está neste documento, diga exatamente: "Para te confirmar esse detalhe específico sem erro, vou te passar o contato direto do nosso especialista: [- **Link de Contato/WhatsApp:** https://wa.me/5567993174612]".
-2. **Proibido Inventar:** Nunca invente preços, prazos, promoções ou serviços que não estejam na seção 3 e 7.
-3. **Formatação:** Nunca envie blocos gigantes de texto. Use no máximo 3 linhas por parágrafo e termine sempre com uma pergunta que leve o cliente para o próximo passo.
-
----
-
-# 7. INTEGRAÇÕES GOOGLE (Agenda, Planilhas e Meu Negócio)
-- **Google Agenda (Calendar):** Conectamos e agendamos consultas/reuniões de apresentação de serviços diretamente na Google Agenda. Você pode agendar na aba Google do app ou pelo WhatsApp [https://wa.me/5567993174612](https://wa.me/5567993174612).
-- **Google Sheets (Planilhas):** Gravamos e sincronizamos os leads e contatos recebidos automaticamente em planilhas do Google Drive.
-- **Google Meu Negócio & AvaliaCard:** Gerenciamos seu perfil no Google Meu Negócio e fornecemos o **AvaliaCard NFC** ([https://avaliacard.vercel.app/](https://avaliacard.vercel.app/)) por R$ 89,00 + frete grátis, para os clientes avaliarem sua empresa com 5 estrelas por aproximação no balcão.`;
+# REGRAS INEGOCIÁVEIS
+1. Responda APENAS com base nas informações acima.
+2. Nunca invente preços, prazos, promoções, serviços ou condições.
+3. Se o cliente perguntar algo que não está neste documento, responda exatamente: "Para te confirmar esse detalhe específico sem erro, vou te passar o contato direto do nosso especialista: https://wa.me/5567993174612"
+4. Envie todos os links como URL pura, sem colchetes nem formatação, para ficarem clicáveis.
+5. Fora do horário de atendimento, você continua respondendo, e avisa que o especialista humano retorna no próximo horário de funcionamento.`;
 
 const DEFAULT_CONFIG: BusinessConfig = {
   companyName: 'Start Mkt Local',
@@ -151,15 +151,15 @@ const DEFAULT_CONFIG: BusinessConfig = {
   whatsappAccessToken: '',
   whatsappPhoneNumberId: '',
   quickQuestions: [
-    'Quais são os serviços?',
-    'Quanto custa?',
-    'Criação de Sites',
-    'Biosite com Atendimento IA',
-    'Avaliacard NFC Google',
-    'Gestor Google Meu Negócio',
-    'Tráfego Meta Ads',
-    'Agente IA WhatsApp',
-    'Falar com Especialista',
+    'Oi, quanto custa um site?',
+    'Achei caro, vou pensar.',
+    'Vocês fazem logomarca?',
+    'Você é um robô?',
+    'Qual o prazo do Meta Ads?',
+    'Tem desconto no PIX?',
+    'E aí mano, quero um bagulho pra aparecer no Google',
+    'Como funciona o Biosite com IA?',
+    'Quero o AvaliaCard',
   ],
   systemPromptAddendum: OFFICIAL_KNOWLEDGE_BASE,
 };
@@ -181,34 +181,39 @@ export async function sendChatMessage(
 
     return await res.json();
   } catch (err) {
-    console.warn('Erro ao chamar /api/chat, utilizando contingência local:', err);
+    console.warn('Erro ao chamar /api/chat, utilizando contingência local humanizada:', err);
 
-    // Fallback response generator according to Start Mkt Local Knowledge Base
-    const q = message.toLowerCase();
-    let reply = `Olá! Eu sou a ${DEFAULT_CONFIG.botName}, especialista de atendimento e vendas da **Start Mkt Local**. Ajudamos sua empresa a vender mais com Sites, Biosites com IA, Google Meu Negócio, Tráfego Meta Ads e o Avaliacard NFC.\n\nQual dessas soluções você gostaria de conhecer hoje?`;
+    const q = message.toLowerCase().trim();
+    let reply = `Para te confirmar esse detalhe específico sem erro, vou te passar o contato direto do nosso especialista: https://wa.me/5567993174612`;
     let needsHumanHandoff = false;
 
-    if (q.includes('site') && !q.includes('bio')) {
-      reply = `Nosso serviço de **Criação de Sites** coloca sua empresa em destaque digital!\n\n• Prazo de entrega: **7 dias**\n• Valor: A partir de **R$ 500,00**\n• Pagamento: PIX (com 5% de desconto) ou até 3x no cartão.\n\nQuer garantir o desenvolvimento do seu site esta semana?`;
-    } else if (q.includes('bio') || q.includes('vicente')) {
-      reply = `O **Biosite com Atendimento Virtual** inclui biosite moderno e agente de IA 24h treinado para saber tudo da sua empresa!\n\n• Modelo para testar: [Acessar Modelo](https://vicenteiaguebiositegoogleia.vercel.app/)\n• Investimento: R$ 167,00 + R$ 50,00/mês de manutenção.\n\nQuer ter um biosite inteligente como esse para sua empresa?`;
-    } else if (q.includes('avalia') || q.includes('nfc')) {
-      reply = `O **Avaliacard** é o cartão inteligente com chip NFC e QR Code com link direto na sua página de avaliação do Google!\n\n• Valor: apenas **R$ 89,00 com Frete Grátis** para todo o Brasil!\n• Website: [Acessar Avaliacard](https://avaliacard.vercel.app/)\n\nQuer garantir o seu Avaliacard com frete grátis agora?`;
-    } else if (q.includes('google') || q.includes('negócio') || q.includes('negocio')) {
-      reply = `Com o **Gestor Google Meu Negócio**, criamos e otimizamos o perfil da sua empresa para dominar as buscas locais no Google Maps!\n\n• Atendemos todo o Brasil | Valor a combinar.\n\nSua empresa já possui perfil no Google ou vamos criar do zero?`;
-    } else if (q.includes('tráfego') || q.includes('trafego') || q.includes('meta') || q.includes('anúncio')) {
-      reply = `Com a **Gestão de Tráfego Meta Ads**, criamos anúncios de alta conversão no Instagram e Facebook direto para o seu WhatsApp!\n\n• Valor: R$ A combinar de acordo com sua meta.\n\nVocê já anuncia atualmente ou quer começar agora?`;
-    } else if (q.includes('quanto custa') || q.includes('preço') || q.includes('preco') || q.includes('valor')) {
-      reply = `Valores dos nossos serviços principais:\n\n• **Criação de Sites**: A partir de R$ 500,00 (7 dias)\n• **Biosite com IA 24h**: R$ 167,00 + R$ 50,00/mês\n• **Avaliacard NFC Google**: R$ 89,00 (Frete Grátis)\n• **Google Meu Negócio e Meta Ads**: R$ A combinar\n\nNo PIX você ganha 5% de desconto imediato! Qual opção cabe melhor no seu plano?`;
-    } else if (q.includes('garantia')) {
-      reply = `Você tem **15 dias de garantia total**! Se tiver qualquer problema, resolvemos sem burocracia.\n\nQuer dar início ao seu projeto hoje mesmo com segurança total?`;
-    } else if (q.includes('desconto')) {
-      reply = `No pagamento via PIX já aplicamos **5% de desconto imediato**! Se quiser fechar um pacote com mais de um serviço, posso chamar nosso especialista no WhatsApp para liberar uma condição especial: [WhatsApp Especialista](https://wa.me/5567993174612).\n\nQual serviço você gostaria de fechar?`;
-    } else if (q.includes('falar com alguém') || q.includes('alguem') || q.includes('humano') || q.includes('atendente') || q.includes('especialista')) {
-      reply = `Certamente! Nosso especialista está disponível diretamente no WhatsApp: [Clique para conversar](https://wa.me/5567993174612) ou ligue ${DEFAULT_CONFIG.businessPhone}.\n\nAtendimento de Seg a Sex (08h às 18h) e Sáb (08h às 12h). Como posso adiantar seu contato?`;
+    if (q.includes('logomarca') || q.includes('logo') || (q.includes('prazo') && !q.includes('site'))) {
+      reply = `Para te confirmar esse detalhe específico sem erro, vou te passar o contato direto do nosso especialista: https://wa.me/5567993174612`;
       needsHumanHandoff = true;
-    } else if (q.includes('serviço') || q.includes('servico')) {
-      reply = `Na **Start Mkt Local**, temos 6 serviços principais: Criação de Sites, Gestor Google Meu Negócio, Biosite com IA 24h, Gestor de Tráfego Meta Ads, Agente de IA no WhatsApp e Avaliacard NFC.\n\nQual dessas soluções você gostaria de conhecer?`;
+    } else if (q.includes('robô') || q.includes('robo')) {
+      reply = `Sou sim! Eu sou a assistente virtual da Start Mkt Local, treinada pra te atender rapidinho por aqui. 😊\n\nSe você quiser falar com nosso especialista humano a qualquer momento, é só me avisar que eu te passo pra ele, beleza?`;
+    } else if (q.includes('caro') || q.includes('vou pensar') || q.includes('valor alto')) {
+      reply = `Entendo total! Só lembro que nossos serviços são feitos pra turbinar negócios locais e te ajudar a vender mais.\n\nPosso te mostrar o parcelamento em até 3x sem juros pra caber no seu orçamento?`;
+    } else if (q.includes('desconto') || q.includes('pix')) {
+      reply = `No PIX já te dou 5% de desconto na hora! Se quiser fechar mais de um serviço, posso chamar nosso especialista no WhatsApp pra liberar uma condição especial. Quer que eu te passe o contato?`;
+    } else if (q.includes('garantia')) {
+      reply = `Você tem 15 dias de garantia total. Se qualquer coisa não ficar como combinado, a gente resolve sem burocracia. Quer seguir com a gente?`;
+    } else if (q.includes('site') && !q.includes('bio')) {
+      reply = `Oi! Tudo bem? Aqui na Start Mkt Local os sites começam a partir de R$ 500,00 e ficam prontos em 7 dias.\n\nMe conta, qual é o seu negócio? Assim eu vejo o que faz mais sentido pra você.`;
+    } else if (q.includes('google') || q.includes('aparecer')) {
+      if (q.includes('mano') || q.includes('bagulho')) {
+        reply = `E aí, tudo tranquilo? Bora resolver isso! A gente faz a Gestão do Google Meu Negócio pra criar e cuidar do perfil da sua empresa e te colocar em destaque nas buscas.\n\nComo se chama você e qual é o seu negócio?`;
+      } else {
+        reply = `Boa! Com a Gestão de Google Meu Negócio a gente cria e cuida do perfil da sua empresa pra te dar destaque nas pesquisas do Google.\n\nMe conta, qual é o seu nome e qual é o ramo do seu negócio?`;
+      }
+    } else if (q.includes('bio') || q.includes('vicente')) {
+      reply = `Show! O Biosite vem com atendimento 24h por um agente de IA que sabe tudo da sua empresa, por R$ 167,00 + R$ 50,00 por mês de manutenção.\n\nOlha o modelo funcionando aqui: https://vicenteiaguebiositegoogleia.vercel.app/\n\nQual é o seu negócio pra gente montar um desse pra você?`;
+    } else if (q.includes('avalia') || q.includes('nfc')) {
+      reply = `Boa pergunta! O AvaliaCard é um cartão com NFC e QR Code que leva seu cliente direto pra avaliação do Google da sua empresa, e sai por R$ 89,00 com frete grátis.\n\nVocê pode ver ele aqui: https://avaliacard.vercel.app/\n\nQuer garantir o seu com frete grátis?`;
+    } else if (q.includes('tráfego') || q.includes('trafego') || q.includes('meta') || q.includes('anúncio') || q.includes('anuncio')) {
+      reply = `Entendi! Na Gestão de Tráfego a gente cria campanhas no Meta Ads pra atrair clientes pro seu negócio, e o valor é a combinar conforme o tamanho do projeto.\n\nQuer que eu te passe o contato do nosso especialista no WhatsApp pra montar sua proposta?`;
+    } else if (q === 'oi' || q === 'olá' || q === 'ola' || q.includes('bom dia') || q.includes('boa tarde') || q.includes('boa noite')) {
+      reply = INITIAL_OPENING_MESSAGE;
     }
 
     return { reply, needsHumanHandoff, isFallback: true };
@@ -318,7 +323,7 @@ export async function simulateWhatsAppIncomingMessage(
     console.warn('Erro ao simular webhook via servidor, gerando resposta simulada:', err);
     return {
       status: 'simulated_local',
-      reply: `[Simulação WhatsApp] Olá! Recebemos sua mensagem "${message}" no número +55 (67) 99317-4612. A assistente LIA está processando normalmente.`,
+      reply: `Oi! Recebi sua mensagem "${message}". Como posso te ajudar hoje?`,
     };
   }
 }
@@ -353,12 +358,11 @@ export async function sendChatMultimodal(
     const isPdf = mimeType.toLowerCase().includes('pdf') || fileName.toLowerCase().endsWith('.pdf');
     return {
       reply: isPdf
-        ? `Recebi seu documento PDF "${fileName}"! Nossos especialistas podem avaliar o conteúdo com você no WhatsApp: https://wa.me/5567993174612`
-        : `Recebi sua imagem com sucesso! Vamos analisar os detalhes no WhatsApp: https://wa.me/5567993174612`,
+        ? `Recebi seu documento PDF "${fileName}"! Nosso especialista pode avaliar ele com você direto no WhatsApp: https://wa.me/5567993174612`
+        : `Recebi sua imagem! Vamos analisar juntos no WhatsApp: https://wa.me/5567993174612`,
       fileDescription: isPdf ? `PDF: ${fileName}` : `Imagem: ${fileName}`,
       needsHumanHandoff: false,
       isFallback: true,
     };
   }
 }
-

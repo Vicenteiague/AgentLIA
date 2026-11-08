@@ -45,91 +45,87 @@ export interface BusinessConfig {
   systemPromptAddendum: string;
 }
 
-export const OFFICIAL_KNOWLEDGE_BASE = `# 1. IDENTIDADE E OBJETIVO
-- **Nome do Agente:** LIA
-- **Empresa:** Start Mkt Local
-- **Papel:** Especialista de atendimento e vendas.
-- **Tom de Voz:** Direto, simpático, consultivo e focado em conversão (mensagens curtas, ideais para leitura no celular).
-- **Objetivo Principal:** Tirar dúvidas sobre o catálogo e conduzir o cliente para o fechamento no WhatsApp.
+export const OFFICIAL_KNOWLEDGE_BASE = `# IDENTIDADE
+Você é a LIA, especialista de atendimento e vendas da Start Mkt Local, agência de marketing digital de Ponta Porã (MS) que atende todo o Brasil.
+Você conversa pelo WhatsApp, como uma pessoa simpática e atenta. Nada de linguagem robótica ou de call center.
 
----
+# COMO VOCÊ FALA
+- Português brasileiro natural, do jeito que as pessoas falam no zap: "pra", "tá", "beleza", "show", "bora".
+- Mensagens curtas. Máximo 3 linhas por parágrafo.
+- No máximo 1 emoji por mensagem, e só quando combinar.
+- Chame o cliente pelo nome assim que souber.
+- Espelhe o jeito dele: se for mais direto, seja direta; se for mais descontraído, relaxe também.
+- Reaja ao que ele disse antes de responder ("Entendi!", "Boa pergunta!"). Varie as expressões, nunca repita a mesma abertura.
+- Nunca use listas longas, títulos ou negrito exagerado. Fale como conversa, não como panfleto.
+- Não despeje todos os serviços de uma vez. Descubra a necessidade e indique só o que faz sentido.
+- Toda mensagem termina com uma pergunta que leve ao próximo passo.
 
-# 2. DADOS DA EMPRESA (Fatos Gerais)
-- **O que fazemos:** Agência de marketing digital
-- **Localização:** Ponta Porã MS atuamos em todo Brasil
-- **Horário de Funcionamento:** Segunda a Sexta, das 08h às 18h | Sábado, das 08h às 12h.
-- **Formas de Pagamento:** PIX , Cartão em até 3x sem juros, Cartão de Débito.
-- **Link de Contato/WhatsApp:** https://wa.me/5567993174612
-- **Link de Contato/Website:** https://www.startmktlocal.com.br/
+# SE PERGUNTAREM SE VOCÊ É ROBÔ
+Seja honesta: diga que é a assistente virtual da Start Mkt Local e que pode passar para o especialista humano quando o cliente quiser. Nunca negue.
 
----
+# FLUXO DA CONVERSA
+1. Cumprimente, diga seu nome e pergunte o nome do cliente.
+2. Pergunte qual é o negócio dele e o que ele quer melhorar.
+3. Indique o serviço mais adequado, explicando o benefício em 1 ou 2 frases.
+4. Passe o valor só quando ele perguntar ou quando fizer sentido.
+5. Quebre objeções com calma (veja abaixo).
+6. Quando ele demonstrar interesse, conduza para o fechamento no WhatsApp com o link.
 
-# 3. CATÁLOGO DE PRODUTOS E SERVIÇOS (Tópicos Chave-Valor)
+# DADOS DA EMPRESA
+- Atuação: todo o Brasil. Sede em Ponta Porã (MS).
+- Horário: segunda a sexta, 08h às 18h | sábado, 08h às 12h.
+- Pagamento: PIX (5% de desconto), cartão em até 3x sem juros e cartão de débito.
+- Garantia: 15 dias.
+- WhatsApp: https://wa.me/5567993174612
+- Site: https://www.startmktlocal.com.br/
 
-## Produto/Serviço 1: Criação de Sites
-- **Para quem é indicado:** Empresas em geral
-- **O que inclui:** Destaque no meio digital
-- **Prazo de entrega:** 7 dias
-- **Valor:** A partir R$ 500,00
+# SERVIÇOS
+1. Criação de Sites
+- Para: empresas em geral. Dá destaque no meio digital.
+- Prazo: 7 dias. Valor: a partir de R$ 500,00.
 
-## Produto/Serviço 2: Gestor Google meu Negócio
-- **Para quem é indicado:** Empresas de todo o Brasil
-- **O que inclui:** Criação e gestão de perfis de empresas no Google
-- **Valor:** R$ A combinar
+2. Gestão de Google Meu Negócio
+- Para: empresas de todo o Brasil.
+- Inclui: criação e gestão do perfil da empresa no Google.
+- Valor: a combinar.
 
-## Produto/Serviço 3: Criação de Biosites com atendimento Virtual
-- **Modelo de Biosite:** https://vicenteiaguebiositegoogleia.vercel.app/
-- **Para quem é indicado:** Empresas de todo o Brasil
-- **O que inclui:** Criação de Biosites com atendimento 24 hrs por agentes de IA treinado para saber tudo da sua empresa
-- **Valor:** R$ 167.00 mais R$50.00 Mês de manutenção do Agente de IA
+3. Biosite com Atendimento Virtual
+- Para: empresas de todo o Brasil.
+- Inclui: biosite com atendimento 24h por agente de IA treinado para saber tudo da empresa.
+- Valor: R$ 167,00 + R$ 50,00 por mês de manutenção do agente de IA.
+- Modelo: https://vicenteiaguebiositegoogleia.vercel.app/
 
-## Produto/Serviço 4: Gestor de tráfego Meta Ads
-- **Para quem é indicado:** Empresas de todo o Brasil
-- **O que inclui:** Criação de campanhas de marketing na Meta Ads
-- **Valor:** R$ A combinar
+4. Gestão de Tráfego (Meta Ads)
+- Para: empresas de todo o Brasil.
+- Inclui: criação de campanhas de marketing no Meta Ads.
+- Valor: a combinar.
 
-## Produto/Serviço 5: Criação de Agente de IA para atendimento no WhatsApp
-- **Para quem é indicado:** Empresas de todo o Brasil
-- **O que inclui:** Criação de Agentes de IA no whatsapp da empresa responsável pelo atendimento e conhecimento total da empresa
-- **Valor:** R$ A combinar
+5. Agente de IA para WhatsApp
+- Para: empresas de todo o Brasil.
+- Inclui: agente de IA no WhatsApp da empresa, responsável pelo atendimento, com conhecimento total do negócio.
+- Valor: a combinar.
 
-## Produto/Serviço 6: Criação do Avaliacard cartão NFC e QR Code de avaliação do Google
-- **Website:** https://avaliacard.vercel.app/
-- **Para quem é indicado:** Empresas de todo o Brasil
-- **O que inclui:** Criação do cartão NFC e QR Code com link direto na página de avaliação do Google
-- **Valor:** R$ 89.00 + Frete grátis
+6. AvaliaCard
+- Para: empresas de todo o Brasil.
+- Inclui: cartão NFC e QR Code com link direto para a página de avaliação do Google.
+- Valor: R$ 89,00 com frete grátis.
+- Site: https://avaliacard.vercel.app/
 
----
+Quando o valor for "a combinar", explique que depende do tamanho do projeto e chame o especialista no WhatsApp pra montar a proposta.
 
-# 4. FAQ E QUEBRA DE OBJEÇÕES (Como responder)
+# OBJEÇÕES
+Desconto: "No PIX já te dou 5% de desconto na hora! Se quiser fechar mais de um serviço, posso chamar nosso especialista no WhatsApp pra liberar uma condição especial. Quer que eu te passe o contato?"
 
-**P: Vocês dão desconto se eu fechar hoje?**
-R: No pagamento via PIX já aplicamos 5% de desconto imediato! Se você quiser fechar um pacote com mais de um item, posso chamar nosso especialista no WhatsApp para liberar uma condição especial para você.
+Garantia: "Você tem 15 dias de garantia total. Se qualquer coisa não ficar como combinado, a gente resolve sem burocracia. Quer seguir com a gente?"
 
-**P: Como funciona a garantia?**
-R: Você tem 15 dias de garantia total. Se tiver qualquer problema, resolvemos sem burocracia.
+Valor alto / vou pensar: "Entendo total! Só lembro que nossos serviços são feitos pra turbinar negócios locais e te ajudar a vender mais. Posso te mostrar o parcelamento em até 3x sem juros pra caber no seu orçamento?"
 
-**P: Achei o valor alto / Vou pensar.**
-R: Entendo perfeitamente! Mas vale lembrar que todos os nossos produtos são de alto desempenho para alavancagem dos Negócios Locais, o que economiza tempo/dinheiro para você. Quer que eu te mostre a opção de parcelamento para caber tranquilo no seu orçamento?
-
----
-
-# 5. TODOS OS LINKS QUE ENVIAR DEVE SER CLICÁVEL
-- Envie sempre em formato de link clicável (ex: [https://wa.me/5567993174612](https://wa.me/5567993174612), [https://www.startmktlocal.com.br/](https://www.startmktlocal.com.br/), [https://vicenteiaguebiositegoogleia.vercel.app/](https://vicenteiaguebiositegoogleia.vercel.app/), [https://avaliacard.vercel.app/](https://avaliacard.vercel.app/)).
-
----
-
-# 6. REGRAS DE OURO (Guardrails)
-1. **Fidelidade aos Dados:** Responda APENAS com base nas informações acima. Se o cliente perguntar algo que não está neste documento, diga exatamente: "Para te confirmar esse detalhe específico sem erro, vou te passar o contato direto do nosso especialista: [- **Link de Contato/WhatsApp:** https://wa.me/5567993174612]".
-2. **Proibido Inventar:** Nunca invente preços, prazos, promoções ou serviços que não estejam na seção 3 e 7.
-3. **Formatação:** Nunca envie blocos gigantes de texto. Use no máximo 3 linhas por parágrafo e termine sempre com uma pergunta que leve o cliente para o próximo passo.
-
----
-
-# 7. INTEGRAÇÕES GOOGLE (Agenda, Planilhas e Meu Negócio)
-- **Google Agenda (Calendar):** Conectamos e agendamos consultas/reuniões de apresentação de serviços diretamente na Google Agenda. Você pode agendar na aba Google do app ou pelo WhatsApp [https://wa.me/5567993174612](https://wa.me/5567993174612).
-- **Google Sheets (Planilhas):** Gravamos e sincronizamos os leads e contatos recebidos automaticamente em planilhas do Google Drive.
-- **Google Meu Negócio & AvaliaCard:** Gerenciamos seu perfil no Google Meu Negócio e fornecemos o **AvaliaCard NFC** ([https://avaliacard.vercel.app/](https://avaliacard.vercel.app/)) por R$ 89,00 + frete grátis, para os clientes avaliarem sua empresa com 5 estrelas por aproximação no balcão.`;
+# REGRAS INEGOCIÁVEIS
+1. Responda APENAS com base nas informações acima.
+2. Nunca invente preços, prazos, promoções, serviços ou condições.
+3. Se o cliente perguntar algo que não está neste documento, responda exatamente: "Para te confirmar esse detalhe específico sem erro, vou te passar o contato direto do nosso especialista: https://wa.me/5567993174612"
+4. Envie todos os links como URL pura, sem colchetes nem formatação, para ficarem clicáveis.
+5. Fora do horário de atendimento, você continua respondendo, e avisa que o especialista humano retorna no próximo horário de funcionamento.`;
 
 let config: BusinessConfig = {
   companyName: process.env.COMPANY_NAME || 'Start Mkt Local',
@@ -144,15 +140,15 @@ let config: BusinessConfig = {
   whatsappAccessToken: process.env.WHATSAPP_ACCESS_TOKEN || '',
   whatsappPhoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID || '',
   quickQuestions: [
-    'Quais são os serviços?',
-    'Quanto custa?',
-    'Criação de Sites',
-    'Biosite com Atendimento IA',
-    'Avaliacard NFC Google',
-    'Gestor Google Meu Negócio',
-    'Tráfego Meta Ads',
-    'Agente IA WhatsApp',
-    'Falar com Especialista',
+    'Oi, quanto custa um site?',
+    'Achei caro, vou pensar.',
+    'Vocês fazem logomarca?',
+    'Você é um robô?',
+    'Qual o prazo do Meta Ads?',
+    'Tem desconto no PIX?',
+    'E aí mano, quero um bagulho pra aparecer no Google',
+    'Como funciona o Biosite com IA?',
+    'Quero o AvaliaCard',
   ],
   systemPromptAddendum: OFFICIAL_KNOWLEDGE_BASE,
 };
@@ -179,24 +175,98 @@ const webhookLogs: WebhookLog[] = [
   },
 ];
 
+/**
+ * Strips Markdown link formatting [texto](url) -> url so all links are pure URLs as required by Rule #4.
+ */
+function sanitizePureLinks(text: string): string {
+  return text
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)/g, '$2')
+    .replace(/\[(https?:\/\/[^\s\]]+)\]/g, '$1')
+    .trim();
+}
+
+/**
+ * Checks current business hours in Ponta Porã - MS (America/Campo_Grande).
+ * Horário: segunda a sexta, 08h às 18h | sábado, 08h às 12h.
+ */
+function getBusinessHoursContext(): { isOpen: boolean; statusText: string } {
+  try {
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'America/Campo_Grande',
+      weekday: 'long',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    const parts = formatter.formatToParts(now);
+    const weekday = (parts.find((p) => p.type === 'weekday')?.value || '').toLowerCase();
+    const hour = parseInt(parts.find((p) => p.type === 'hour')?.value || '10', 10);
+
+    const isSunday = weekday.includes('domingo');
+    const isSaturday = weekday.includes('sábado') || weekday.includes('sabado');
+    let isOpen = false;
+    if (isSunday) {
+      isOpen = false;
+    } else if (isSaturday) {
+      isOpen = hour >= 8 && hour < 12;
+    } else {
+      isOpen = hour >= 8 && hour < 18;
+    }
+
+    return {
+      isOpen,
+      statusText: `Dia atual em Ponta Porã (MS): ${weekday}, ${hour}h (${
+        isOpen
+          ? 'DENTRO do horário comercial'
+          : 'FORA do horário comercial — você continua atendendo normalmente 24h, e se falarem de especialista humano ou horário, avise que o especialista humano retorna no próximo horário de funcionamento: seg a sex 08h às 18h ou sáb 08h às 12h'
+      }).`,
+    };
+  } catch {
+    return { isOpen: true, statusText: 'Horário comercial: segunda a sexta 08h às 18h | sábado 08h às 12h.' };
+  }
+}
+
 function buildSystemPrompt() {
-  return `Você é a ${config.botName}, ${config.botRole} da ${config.companyName}.
-Responda de forma direta, simpática, consultiva e focada em conversão, ideal para leitura rápida no celular (máximo de 3 linhas por parágrafo, terminando sempre com uma pergunta para o próximo passo).
+  const hoursCtx = getBusinessHoursContext();
+  return `${config.systemPromptAddendum || OFFICIAL_KNOWLEDGE_BASE}
 
-BASE DE CONHECIMENTO OFICIAL E DIRETRIZES:
-${OFFICIAL_KNOWLEDGE_BASE}
+# CONTEXTO DE HORÁRIO ATUAL
+${hoursCtx.statusText}
 
-DIRETRIZES CRÍTICAS DE PRECISÃO:
-1. Se o cliente perguntar "qual o site da agência", "qual o site de vocês", "qual seu site" ou pedir o link/site da Start Mkt Local, responda OBRIGATORIAMENTE informando o website oficial da agência: [https://www.startmktlocal.com.br/](https://www.startmktlocal.com.br/). NÃO confunda isso com o serviço de contratação de Criação de Sites.
-2. Se o cliente perguntar sobre o serviço de Criação de Sites (para criar um site para a empresa dele), informe que criamos sites a partir de R$ 500,00 com entrega em 7 dias.
-3. Se perguntar sobre o Biosite com IA ou quiser ver modelo/exemplo, informe o valor de R$ 167,00 + R$ 50,00/mês e o link do modelo: [https://vicenteiaguebiositegoogleia.vercel.app/](https://vicenteiaguebiositegoogleia.vercel.app/).
-4. Se perguntar sobre o Avaliacard NFC, informe R$ 89,00 com Frete Grátis e o link: [https://avaliacard.vercel.app/](https://avaliacard.vercel.app/Platform).
-5. Se perguntar sobre contato, WhatsApp ou atendimento humano, envie o link clicável: [https://wa.me/5567993174612](https://wa.me/5567993174612) e o telefone ${config.businessPhone}.
-6. Se perguntar onde fica ou horário, responda Ponta Porã - MS (atendemos todo Brasil), Seg a Sex 08h-18h e Sáb 08h-12h.
-7. Todos os links enviados devem ser em Markdown clicável [Texto](URL) e reais.
-8. Nunca invente dados fora da base de conhecimento oficial.
+# EXEMPLOS DE REFERÊNCIA (SIGA EXATAMENTE ESTE ESTILO E ESTAS REGRAS)
 
-${config.systemPromptAddendum && config.systemPromptAddendum !== OFFICIAL_KNOWLEDGE_BASE ? `\nINSTRUÇÕES ADICIONAIS:\n${config.systemPromptAddendum}` : ''}
+Mensagem de abertura:
+Oi! Tudo bem? 😊 Eu sou a LIA, da Start Mkt Local.
+Posso te ajudar com site, Google Meu Negócio, anúncios e mais.
+Qual é o seu nome e o que você tá buscando pro seu negócio?
+
+Exemplo 1 (dúvida de preço):
+Cliente: Oi, quanto custa um site?
+LIA: Oi! Tudo bem? Aqui na Start Mkt Local os sites começam a partir de R$ 500,00 e ficam prontos em 7 dias.
+Me conta, qual é o seu negócio? Assim eu vejo o que faz mais sentido pra você.
+
+Exemplo 2 (objeção de valor):
+Cliente: Achei caro, vou pensar.
+LIA: Entendo total! Só lembro que nossos serviços são feitos pra turbinar negócios locais e te ajudar a vender mais.
+Posso te mostrar o parcelamento em até 3x sem juros pra caber no seu orçamento?
+
+Exemplo 3 (fora do escopo / informação não presente nos dados):
+Cliente: Vocês fazem logomarca?
+LIA: Para te confirmar esse detalhe específico sem erro, vou te passar o contato direto do nosso especialista: https://wa.me/5567993174612
+
+Exemplo 4 (prazo de serviço que não tem prazo listado no documento):
+Cliente: Qual o prazo do Meta Ads?
+LIA: Para te confirmar esse detalhe específico sem erro, vou te passar o contato direto do nosso especialista: https://wa.me/5567993174612
+
+Exemplo 5 (pergunta se é robô):
+Cliente: Você é um robô?
+LIA: Sou sim! Eu sou a assistente virtual aqui da Start Mkt Local, treinada pra te ajudar rapidinho pelo WhatsApp. 😊
+Se você quiser falar direto com nosso especialista humano a qualquer momento, é só me pedir que te passo pra ele. Como posso te ajudar hoje?
+
+Exemplo 6 (desconto no PIX):
+Cliente: Tem desconto no PIX?
+LIA: No PIX já te dou 5% de desconto na hora! Se quiser fechar mais de um serviço, posso chamar nosso especialista no WhatsApp pra liberar uma condição especial. Quer que eu te passe o contato?
 `;
 }
 
@@ -213,389 +283,337 @@ function getActiveSemanticIndex(cfg: BusinessConfig): SemanticIndex {
   return cachedSemanticIndex;
 }
 
-// Instant Knowledge Base Semantic Matcher (< 20ms response time)
+/**
+ * Extracts customer name from conversation history or current message if mentioned.
+ */
+function extractClientName(
+  message: string,
+  history: Array<{ role: string; text: string }> = []
+): string | null {
+  const allUserTexts = [
+    ...history.filter((h) => h.role === 'user').map((h) => h.text),
+    message,
+  ];
+  const namePatterns = [
+    /(?:meu nome é|meu nome e|me chamo|eu sou o|eu sou a|sou o|sou a|pode me chamar de)\s+([A-ZÀ-Ÿa-zà-ÿ]{2,20})/i,
+    /^([A-ZÀ-Ÿ][a-zà-ÿ]{2,15})\s*[,.-]\s*(?:tenho|quero|preciso|sou)/i,
+  ];
+
+  for (let i = allUserTexts.length - 1; i >= 0; i--) {
+    const txt = allUserTexts[i].trim();
+    for (const pattern of namePatterns) {
+      const m = txt.match(pattern);
+      if (m && m[1]) {
+        const candidate = m[1].trim();
+        const ignore = new Set([
+          'oi', 'ola', 'olá', 'bom', 'boa', 'tudo', 'bem', 'quero', 'preciso',
+          'cliente', 'dono', 'empresario', 'empresário', 'interessado', 'mano',
+        ]);
+        if (!ignore.has(candidate.toLowerCase())) {
+          return candidate.charAt(0).toUpperCase() + candidate.slice(1).toLowerCase();
+        }
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Strict guardrail checker: returns the exact required out-of-scope sentence if the user asks
+ * for something not in the official document (e.g. logo, prazo for Meta Ads/GMN/IA, etc.).
+ */
+function checkStrictGuardrail(query: string): { reply: string; needsHumanHandoff: boolean } | null {
+  const q = query.toLowerCase().trim();
+  const exactOutOfScopeReply =
+    'Para te confirmar esse detalhe específico sem erro, vou te passar o contato direto do nosso especialista: https://wa.me/5567993174612';
+
+  // 1. Prazos de serviços que NÃO têm prazo no documento (apenas Criação de Sites tem prazo de 7 dias)
+  if (
+    q.includes('prazo') ||
+    q.includes('quanto tempo demora') ||
+    q.includes('quantos dias demora') ||
+    q.includes('em quanto tempo fica pronto')
+  ) {
+    const isAboutSite =
+      (q.includes('site') || q.includes('pagina') || q.includes('página')) &&
+      !q.includes('biosite') &&
+      !q.includes('bio site');
+    if (!isAboutSite) {
+      return { reply: exactOutOfScopeReply, needsHumanHandoff: true };
+    }
+  }
+
+  // 2. Serviços ou itens que não estão no documento
+  const outOfScopeTerms = [
+    'logomarca',
+    'logotipo',
+    'fazer logo',
+    'criam logo',
+    'fazem logo',
+    'identidade visual',
+    'cartão de visita',
+    'cartao de visita',
+    'panfleto',
+    'folder',
+    'outdoor',
+    'hospedagem',
+    'registro de domínio',
+    'registro de dominio',
+    'tiktok',
+    'youtube',
+    'linkedin',
+    'pinterest',
+    'email marketing',
+    'e-mail marketing',
+    'assessoria de imprensa',
+    'fotografia',
+    'filmagem',
+    'edição de vídeo',
+    'edicao de video',
+    'nota fiscal',
+    'cnpj da empresa',
+  ];
+
+  if (outOfScopeTerms.some((term) => q.includes(term))) {
+    return { reply: exactOutOfScopeReply, needsHumanHandoff: true };
+  }
+
+  return null;
+}
+
+/**
+ * Humanized WhatsApp conversational responder (used as instant guardrail & high-speed fallback).
+ */
 function findKnowledgeBaseAnswer(
   query: string,
-  cfg: BusinessConfig
+  cfg: BusinessConfig,
+  history: Array<{ role: string; text: string }> = []
 ): { reply: string; needsHumanHandoff: boolean } | null {
   const q = query.toLowerCase().trim();
+  const whatsappUrl = 'https://wa.me/5567993174612';
+  const websiteUrl = 'https://www.startmktlocal.com.br/';
+  const clientName = extractClientName(query, history);
+  const namePrefix = clientName ? `${clientName}, ` : '';
+  const hoursCtx = getBusinessHoursContext();
 
-  // 1. Semantic Index Matching (Instant < 5ms semantic topic recovery with entity grounding)
-  try {
-    const semIndex = getActiveSemanticIndex(cfg);
-    const semMatch = matchSemanticQuery(query, semIndex, cfg);
-    if (semMatch.isMatch && semMatch.confidence >= 35) {
-      return {
-        reply: semMatch.reply,
-        needsHumanHandoff: semMatch.needsHumanHandoff,
-      };
-    }
-  } catch (err) {
-    console.warn('Erro ao processar correspondência semântica:', err);
+  // Check if user is talking about off-hours / Sunday / night
+  const mentionsOffHours =
+    q.includes('domingo') ||
+    q.includes('feriado') ||
+    q.includes('madrugada') ||
+    q.includes('fora do horário') ||
+    q.includes('fora do horario') ||
+    q.includes('atende agora') ||
+    q.includes('abertos agora');
+
+  const offHoursNote =
+    mentionsOffHours || !hoursCtx.isOpen
+      ? '\n\nAh, eu continuo te atendendo por aqui normalmente, e nosso especialista humano retorna no próximo horário de funcionamento (segunda a sexta das 08h às 18h e sábado das 08h às 12h).'
+      : '';
+
+  // Check if tone is super informal
+  const isInformal =
+    q.includes('mano') ||
+    q.includes('bagulho') ||
+    q.includes('parça') ||
+    q.includes('parca') ||
+    q.includes('brother') ||
+    q.includes('irmão') ||
+    q.includes('irmao') ||
+    q.includes('bora') ||
+    q.includes('trampo');
+
+  // 1. Strict Out-of-Scope Guardrail (Regra Inegociável #3)
+  const guardrail = checkStrictGuardrail(query);
+  if (guardrail) {
+    return guardrail;
   }
 
-  // 2. Greetings
+  // 2. Pergunta se é robô / IA
   if (
-    q === 'oi' ||
-    q === 'ola' ||
-    q === 'olá' ||
-    q === 'bom dia' ||
-    q === 'boa tarde' ||
-    q === 'boa noite' ||
-    q === 'tudo bem' ||
-    q === 'ola!' ||
-    q === 'olá!' ||
-    q === 'oi lia' ||
-    q === 'olá lia' ||
-    q === 'ola lia' ||
-    q === 'ola tudo bem' ||
-    q === 'olá tudo bem' ||
-    q === 'opa' ||
-    q === 'e ai' ||
-    q === 'e aí'
+    q.includes('robô') ||
+    q.includes('robo') ||
+    q.includes('é uma ia') ||
+    q.includes('e uma ia') ||
+    q.includes('assistente virtual') ||
+    q.includes('pessoa de verdade') ||
+    q.includes('atendente de verdade')
   ) {
     return {
-      reply: `Olá! Eu sou a ${cfg.botName}, especialista de atendimento e vendas da **${cfg.companyName}**.\n\nAjudamos empresas de todo o Brasil a venderem mais com Sites, Biosites com IA, Google Meu Negócio, Tráfego Pago e Agentes de WhatsApp.\n\nQual dessas soluções você gostaria de conhecer hoje?`,
+      reply: `Sou sim! Eu sou a assistente virtual da ${cfg.companyName}, treinada pra te ajudar rapidinho aqui pelo WhatsApp. 😊\n\nSe você preferir falar direto com nosso especialista humano, eu te passo pra ele quando você quiser. Quer continuar tirando sua dúvida comigo ou prefere que eu chame ele?`,
       needsHumanHandoff: false,
     };
   }
 
-  // 3. Website Oficial da Agência / Link da Empresa (Prioritário para nunca confundir com o serviço de criar sites)
-  const agencySitePatterns = [
-    'qual o site',
-    'qual e o site',
-    'qual é o site',
-    'qual seu site',
-    'qual o website',
-    'qual a pagina',
-    'qual a página',
-    'site da agência',
-    'site da agencia',
-    'site da empresa',
-    'site de vocês',
-    'site de voces',
-    'site do negócio',
-    'link do site',
-    'link da agência',
-    'link da agencia',
-    'link da empresa',
-    'passa o site',
-    'manda o site',
-    'ver o site',
-    'endereço do site',
-    'endereco do site',
-    'pagina da empresa',
-    'página da empresa',
-    'website oficial',
-    'site oficial',
-    'vocês têm site',
-    'voces tem site',
-    'tem site',
-    'startmktlocal',
-    'start mkt local',
-  ];
-  const isAskingAgencySite =
-    agencySitePatterns.some((pattern) => q.includes(pattern)) ||
-    q === 'site' ||
-    q === 'website' ||
-    q === 'o site' ||
-    q === 'qual o site?';
-
-  if (isAskingAgencySite) {
+  // 3. Conversa 2: Objeção de valor ("Achei caro, vou pensar.")
+  if (
+    q.includes('achei caro') ||
+    q.includes('tá caro') ||
+    q.includes('ta caro') ||
+    q.includes('muito caro') ||
+    q.includes('vou pensar') ||
+    q.includes('valor alto') ||
+    q.includes('achei alto')
+  ) {
     return {
-      reply: `O website oficial da **Start Mkt Local** é: [https://www.startmktlocal.com.br/](https://www.startmktlocal.com.br/).\n\nLá você pode conferir nossos serviços, portfólio e diferenciais! Você também pode falar direto com nosso especialista no WhatsApp: [https://wa.me/5567993174612](https://wa.me/5567993174612).\n\nQual serviço da nossa agência você gostaria de conhecer melhor?`,
+      reply: `Entendo total! Só lembro que nossos serviços são feitos pra turbinar negócios locais e te ajudar a vender mais.\n\nPosso te mostrar o parcelamento em até 3x sem juros pra caber no seu orçamento?`,
       needsHumanHandoff: false,
     };
   }
 
-  // 4. Todos os Links Oficiais / Links Clicáveis
-  const allLinksPatterns = [
-    'links',
-    'manda os links',
-    'mandar os links',
-    'passa os links',
-    'quais os links',
-    'quais são os links',
-    'links clicaveis',
-    'links clicáveis',
-    'todos os links',
-  ];
-  if (allLinksPatterns.some((p) => q.includes(p))) {
+  // 4. Objeção: Desconto / PIX ("Tem desconto no PIX?")
+  if (q.includes('desconto') || q.includes('pix')) {
     return {
-      reply: `Aqui estão todos os links oficiais da **Start Mkt Local** clicáveis para você acessar:\n\n🌐 **Website Oficial:**\n[https://www.startmktlocal.com.br/](https://www.startmktlocal.com.br/)\n\n💬 **WhatsApp do Especialista:**\n[https://wa.me/5567993174612](https://wa.me/5567993174612)\n\n📱 **Modelo Biosite IA:**\n[https://vicenteiaguebiositegoogleia.vercel.app/](https://vicenteiaguebiositegoogleia.vercel.app/)\n\n⭐ **Website Avaliacard NFC:**\n[https://avaliacard.vercel.app/](https://avaliacard.vercel.app/)\n\nQual deles você gostaria de conferir primeiro?`,
+      reply: `No PIX já te dou 5% de desconto na hora! Se quiser fechar mais de um serviço, posso chamar nosso especialista no WhatsApp pra liberar uma condição especial. Quer que eu te passe o contato?`,
       needsHumanHandoff: false,
     };
   }
 
-  // 5. WhatsApp / Telefone / Atendimento Humano
-  const handoffKeywords = [
-    'falar com alguém',
-    'falar com alguem',
-    'falar com uma pessoa',
-    'falar com especialista',
-    'especialista',
-    'atendente',
-    'humano',
-    'falar com humano',
-    'consultor',
-    'suporte',
-    'pessoa',
-    'atendimento humano',
-    'número',
-    'numero',
-    'numero de telefone',
-    'número de telefone',
-    'telefone',
-    'contato',
-    'qual o whatsapp',
-    'qual o telefone',
-    'whatsapp da empresa',
-    'whatsapp do especialista',
-  ];
-  if (handoffKeywords.some((k) => q.includes(k))) {
+  // 5. Objeção: Garantia
+  if (q.includes('garantia')) {
     return {
-      reply: `Com certeza! Vou te conectar direto com nosso especialista da **Start Mkt Local**.\n\nClique no link para conversar agora no WhatsApp: [WhatsApp Especialista](https://wa.me/5567993174612) ou ligue **${cfg.businessPhone}**.\n\nNosso atendimento funciona de Seg a Sex (08h às 18h) e Sáb (08h às 12h). Como posso adiantar seu atendimento?`,
+      reply: `Você tem 15 dias de garantia total. Se qualquer coisa não ficar como combinado, a gente resolve sem burocracia. Quer seguir com a gente?`,
+      needsHumanHandoff: false,
+    };
+  }
+
+  // 6. Pergunta sobre atendimento fora do horário (ex: domingo)
+  if (mentionsOffHours && !q.includes('site') && !q.includes('google') && !q.includes('anúncio')) {
+    return {
+      reply: `Oi! Tudo bem? Eu continuo te atendendo por aqui normalmente! 😊 Nosso especialista humano retorna no próximo horário de funcionamento (segunda a sexta das 08h às 18h e sábado das 08h às 12h).\n\nQual é o seu nome e o que você tá buscando melhorar no seu negócio hoje?`,
+      needsHumanHandoff: false,
+    };
+  }
+
+  // 7. Conversa 1: Criação de Sites / "Oi, quanto custa um site?"
+  if (
+    (q.includes('site') || q.includes('landing page')) &&
+    !q.includes('biosite') &&
+    !q.includes('bio site') &&
+    !q.includes('site de vocês') &&
+    !q.includes('site de voces') &&
+    !q.includes('site da agência') &&
+    !q.includes('site da agencia') &&
+    !q.includes('qual o site')
+  ) {
+    if (isInformal) {
+      return {
+        reply: `E aí, beleza? Bora fazer esse site sair do papel! Aqui na ${cfg.companyName} os sites começam a partir de R$ 500,00 e ficam prontos em 7 dias pra destacar sua empresa.\n\nQual é o seu nome e qual é o seu ramo pra gente trocar uma ideia?`,
+        needsHumanHandoff: false,
+      };
+    }
+    return {
+      reply: `Oi! Tudo bem? Aqui na ${cfg.companyName} os sites começam a partir de R$ 500,00 e ficam prontos em 7 dias.\n\nMe conta, qual é o seu negócio? Assim eu vejo o que faz mais sentido pra você.`,
+      needsHumanHandoff: false,
+    };
+  }
+
+  // 8. Google Meu Negócio (incluindo versão informal "e aí mano, quero um bagulho pra aparecer no Google")
+  if (
+    q.includes('google') ||
+    q.includes('aparecer no google') ||
+    q.includes('meu negócio') ||
+    q.includes('meu negocio')
+  ) {
+    if (isInformal) {
+      return {
+        reply: `E aí, beleza? Bora resolver isso! A gente faz a Gestão de Google Meu Negócio, criando e cuidando do perfil da sua empresa pra você aparecer bem posicionado no Google.\n\nComo o valor é a combinar conforme o tamanho do projeto, me diz aí: qual é o seu nome e qual é o seu negócio?`,
+        needsHumanHandoff: false,
+      };
+    }
+    return {
+      reply: `Boa! ${namePrefix}com a Gestão de Google Meu Negócio a gente cria e cuida do perfil da sua empresa pra destacar seu negócio nas buscas do Google.\n\nComo o valor depende do tamanho do projeto, me conta: qual é o seu negócio e o que você quer melhorar hoje?`,
+      needsHumanHandoff: false,
+    };
+  }
+
+  // 9. Biosite com Atendimento Virtual
+  if (q.includes('biosite') || q.includes('bio site') || q.includes('vicente')) {
+    return {
+      reply: `Show! O Biosite vem com atendimento 24h por um agente de IA treinado pra saber tudo da sua empresa. O valor é R$ 167,00 + R$ 50,00 por mês de manutenção.\n\nDá uma olhada nesse modelo funcionando: https://vicenteiaguebiositegoogleia.vercel.app/\n\nO que você achou pra usar no seu negócio?`,
+      needsHumanHandoff: false,
+    };
+  }
+
+  // 10. AvaliaCard
+  if (q.includes('avaliacard') || q.includes('avalia card') || q.includes('nfc') || q.includes('cartão de avaliação') || q.includes('cartao de avaliacao')) {
+    return {
+      reply: `Boa pergunta! O AvaliaCard é um cartão com NFC e QR Code que leva seu cliente direto pra página de avaliação do Google da sua empresa. Ele custa R$ 89,00 com frete grátis!\n\nVocê pode ver ele aqui: https://avaliacard.vercel.app/\n\nQuer pedir o seu agora?`,
+      needsHumanHandoff: false,
+    };
+  }
+
+  // 11. Gestão de Tráfego (Meta Ads)
+  if (q.includes('meta ads') || q.includes('tráfego') || q.includes('trafego') || q.includes('anúncio') || q.includes('anuncio') || q.includes('campanha')) {
+    return {
+      reply: `Entendi! Na Gestão de Tráfego a gente cria campanhas no Meta Ads pra atrair clientes pro seu negócio. O valor é a combinar porque depende do tamanho do projeto.\n\nQuer que eu chame nosso especialista no WhatsApp pra montar uma proposta pra você?`,
+      needsHumanHandoff: false,
+    };
+  }
+
+  // 12. Agente de IA para WhatsApp
+  if (q.includes('agente de ia') || q.includes('agente ia') || q.includes('ia para whatsapp') || q.includes('ia no whatsapp')) {
+    return {
+      reply: `Show! A gente cria um Agente de IA direto no WhatsApp da sua empresa, responsável pelo atendimento e com conhecimento total do seu negócio.\n\nComo o valor é a combinar de acordo com o tamanho do projeto, quer que eu te passe o contato do nosso especialista pra montar a proposta?`,
+      needsHumanHandoff: false,
+    };
+  }
+
+  // 13. Site Oficial da Agência
+  if (
+    q.includes('qual o site') ||
+    q.includes('site de vocês') ||
+    q.includes('site de voces') ||
+    q.includes('site da agência') ||
+    q.includes('site da agencia') ||
+    q.includes('startmktlocal')
+  ) {
+    return {
+      reply: `Claro! O nosso site oficial é esse aqui:\n${websiteUrl}\n\nMe conta, qual é o seu nome e o que você tá querendo melhorar no seu negócio?`,
+      needsHumanHandoff: false,
+    };
+  }
+
+  // 14. Falar com Especialista / WhatsApp
+  if (
+    q.includes('especialista') ||
+    q.includes('atendente') ||
+    q.includes('humano') ||
+    q.includes('falar com alguém') ||
+    q.includes('falar com alguem') ||
+    q.includes('whatsapp') ||
+    q.includes('contato')
+  ) {
+    return {
+      reply: `Beleza! Vou te passar o contato direto do nosso especialista no WhatsApp:\n${whatsappUrl}${offHoursNote}\n\nQual é o seu nome pra eu já deixar registrado por aqui?`,
       needsHumanHandoff: true,
     };
   }
 
-  // 6. Serviço 1: Criação de Sites (Apenas quando o usuário quer criar/contratar um site para a empresa dele)
-  const siteCreationPhrases = [
-    'criação de sites',
-    'criacao de sites',
-    'criação de site',
-    'criacao de site',
-    'criar site',
-    'criar um site',
-    'fazer site',
-    'fazer um site',
-    'desenvolver site',
-    'desenvolvimento de site',
-    'construir site',
-    'construção de site',
-    'quanto custa um site',
-    'valor do site',
-    'preço do site',
-    'quero um site',
-    'preciso de um site',
-    'vocês fazem site',
-    'voces fazem site',
-    'vocês criam site',
-    'voces criam site',
-    'serviço de site',
-    'servico de site',
-    'landing page',
-  ];
-  if (siteCreationPhrases.some((phrase) => q.includes(phrase)) && !q.includes('bio')) {
+  // 15. Horário e Localização
+  if (q.includes('horário') || q.includes('horario') || q.includes('onde fica') || q.includes('ponta porã') || q.includes('ponta pora')) {
     return {
-      reply: `Nosso serviço de **Criação de Sites** coloca sua empresa em destaque total no meio digital!\n\n• **Prazo de entrega:** Apenas 7 dias\n• **Valor:** A partir de R$ 500,00\n• **Para quem é:** Empresas em geral que desejam presença forte e autoridade na internet.\n\nQuer garantir a criação do site da sua empresa esta semana?`,
+      reply: `Nossa sede fica em Ponta Porã (MS) e atendemos empresas de todo o Brasil! Nosso horário é de segunda a sexta das 08h às 18h, e sábado das 08h às 12h.${offHoursNote}\n\nComo é o seu nome e qual é o seu negócio?`,
       needsHumanHandoff: false,
     };
   }
 
-  // 7. Serviço 3: Biosite com Atendimento Virtual
-  const biositeKeywords = [
-    'biosite',
-    'bio site',
-    'atendimento virtual',
-    'vicente',
-    'vicenteiague',
-    'biosites',
-    'modelo de biosite',
-    'exemplo de biosite',
-  ];
-  if (biositeKeywords.some((k) => q.includes(k))) {
+  // 16. Saudações simples
+  if (
+    q === 'oi' ||
+    q === 'olá' ||
+    q === 'ola' ||
+    q === 'bom dia' ||
+    q === 'boa tarde' ||
+    q === 'boa noite' ||
+    q === 'tudo bem' ||
+    q === 'tudo bem?' ||
+    q === 'opa' ||
+    q === 'e aí' ||
+    q === 'e ai'
+  ) {
     return {
-      reply: `O **Biosite com Atendimento Virtual** inclui um biosite moderno e agente de IA 24 horas treinado com todo o conhecimento da sua empresa!\n\n• **Valor:** R$ 167,00 + R$ 50,00/mês de manutenção do Agente de IA\n• **Exemplo Real Funcionando:** [Ver Modelo de Biosite](https://vicenteiaguebiositegoogleia.vercel.app/)\n\nQuer que eu crie um biosite inteligente como esse para sua empresa?`,
-      needsHumanHandoff: false,
-    };
-  }
-
-  // 8. Serviço 6: Avaliacard NFC & QR Code Google
-  const avaliacardKeywords = [
-    'avaliacard',
-    'avalia card',
-    'nfc',
-    'cartao nfc',
-    'cartão nfc',
-    'avaliação do google',
-    'avaliacao do google',
-    'avaliacoes google',
-    'avaliações google',
-    'qr code avaliacao',
-    'cartão de avaliação',
-    'cartao de avaliacao',
-  ];
-  if (avaliacardKeywords.some((k) => q.includes(k))) {
-    return {
-      reply: `O **Avaliacard** é o cartão inteligente com chip NFC e QR Code com link direto na página de avaliação do Google da sua empresa!\n\n• **Valor:** Apenas R$ 89,00 + **Frete Grátis** para todo o Brasil!\n• **Website Oficial do Produto:** [Ver Website Avaliacard](https://avaliacard.vercel.app/)\n\nMultiplique suas avaliações 5 estrelas no Google! Quer receber o seu Avaliacard com frete grátis?`,
-      needsHumanHandoff: false,
-    };
-  }
-
-  // 9. Serviço 2: Gestor Google Meu Negócio
-  const gmnKeywords = [
-    'google meu negócio',
-    'google meu negocio',
-    'meu negócio',
-    'meu negocio',
-    'gestor google',
-    'perfil no google',
-    'google maps',
-    'gmn',
-    'aparecer no google',
-    'ficha do google',
-  ];
-  if (gmnKeywords.some((k) => q.includes(k))) {
-    return {
-      reply: `Com a **Gestão do Google Meu Negócio**, cuidamos da criação, otimização e gestão do perfil da sua empresa para você se destacar nas buscas e no Google Maps!\n\n• **Para quem é:** Empresas de todo o Brasil\n• **Valor:** R$ A combinar (personalizado para seu segmento)\n\nSua empresa já tem cadastro no Google ou deseja criar e ranquear do zero?`,
-      needsHumanHandoff: false,
-    };
-  }
-
-  // 10. Serviço 4: Gestor de Tráfego Meta Ads
-  const metaAdsKeywords = [
-    'meta ads',
-    'tráfego',
-    'trafego',
-    'gestor de tráfego',
-    'gestor de trafego',
-    'anúncios',
-    'anuncios',
-    'facebook ads',
-    'instagram ads',
-    'campanha',
-    'campanhas',
-    'anunciar no instagram',
-    'anunciar no facebook',
-  ];
-  if (metaAdsKeywords.some((k) => q.includes(k))) {
-    return {
-      reply: `Com a **Gestão de Tráfego Meta Ads**, criamos campanhas de marketing de alta conversão no Facebook e Instagram para direcionar clientes qualificados direto para seu WhatsApp!\n\n• **Para quem é:** Empresas de todo o Brasil\n• **Valor:** R$ A combinar conforme o volume da sua campanha\n\nVocê já anuncia atualmente ou quer começar a atrair novos clientes esta semana?`,
-      needsHumanHandoff: false,
-    };
-  }
-
-  // 11. Serviço 5: Criação de Agente de IA no WhatsApp
-  const botKeywords = [
-    'agente de ia',
-    'agente ia',
-    'ia para whatsapp',
-    'ia no whatsapp',
-    'atendimento no whatsapp',
-    'chatbot',
-    'bot whatsapp',
-    'robô de whatsapp',
-    'robo de whatsapp',
-    'atendimento virtual whatsapp',
-    'assistente virtual',
-  ];
-  if (botKeywords.some((k) => q.includes(k))) {
-    return {
-      reply: `Criamos **Agentes de IA no WhatsApp** da sua empresa responsáveis pelo atendimento 24 horas por dia, tirando dúvidas, enviando links clicáveis e convertendo vendas!\n\n• **O que inclui:** Treinamento com conhecimento total da sua empresa\n• **Valor:** R$ A combinar\n\nQuer colocar uma assistente inteligente como eu trabalhando no WhatsApp da sua empresa?`,
-      needsHumanHandoff: false,
-    };
-  }
-
-  // 12. Catálogo Geral de Serviços
-  const servicesKeywords = [
-    'quais são os serviços',
-    'quais sao os servicos',
-    'quais os serviços',
-    'quais os servicos',
-    'serviços',
-    'servicos',
-    'o que vocês fazem',
-    'o que voces fazem',
-    'o que você faz',
-    'o que voce faz',
-    'catálogo',
-    'catalogo',
-    'soluções',
-    'solucoes',
-    'produtos',
-    'quais os produtos',
-  ];
-  if (servicesKeywords.some((k) => q.includes(k))) {
-    return {
-      reply: `A **Start Mkt Local** é uma agência de marketing digital que oferece 6 serviços de alto desempenho para negócios locais em todo o Brasil:\n\n1. 🌐 **Criação de Sites** (a partir de R$ 500, entrega em 7 dias)\n2. 📍 **Gestor Google Meu Negócio** (destaque nas buscas locais)\n3. 📱 **Biosite com Atendimento Virtual IA** (R$ 167 + R$ 50/mês: [Ver Modelo](https://vicenteiaguebiositegoogleia.vercel.app/))\n4. 📈 **Gestor de Tráfego Meta Ads** (anúncios no Instagram/Facebook)\n5. 🤖 **Agente de IA no WhatsApp** (atendimento e vendas 24h)\n6. ⭐ **Avaliacard NFC Google** (R$ 89 com frete grátis: [Ver Website](https://avaliacard.vercel.app/))\n\nQual dessas soluções você gostaria de contratar para seu negócio?`,
-      needsHumanHandoff: false,
-    };
-  }
-
-  // 13. Tabela de Preços / Quanto custa
-  const priceKeywords = [
-    'quanto custa',
-    'preço',
-    'preco',
-    'preços',
-    'precos',
-    'valor',
-    'valores',
-    'tabela',
-    'custa',
-    'quanto sai',
-    'quanto é',
-    'quanto e',
-    'orçamento',
-    'orcamento',
-  ];
-  if (priceKeywords.some((k) => q.includes(k))) {
-    return {
-      reply: `Aqui estão os valores dos serviços da **Start Mkt Local**:\n\n• **Criação de Sites:** A partir de R$ 500,00 (entrega em 7 dias)\n• **Biosite com Atendimento Virtual IA:** R$ 167,00 + R$ 50,00/mês de manutenção\n• **Avaliacard Cartão NFC Google:** R$ 89,00 com Frete Grátis\n• **Google Meu Negócio, Meta Ads e Agente IA:** Valores personalizados a combinar\n\nNo PIX você ganha **5% de desconto imediato**, ou parcelamos no cartão em até 3x sem juros! Qual desses serviços se encaixa melhor no seu orçamento?`,
-      needsHumanHandoff: false,
-    };
-  }
-
-  // 14. Desconto PIX / Condição Especial
-  const discountKeywords = [
-    'desconto',
-    'fechar hoje',
-    'condição especial',
-    'condicao especial',
-    'tem desconto',
-    'mais barato',
-    'faz um desconto',
-  ];
-  if (discountKeywords.some((k) => q.includes(k))) {
-    return {
-      reply: `No pagamento via PIX já aplicamos **5% de desconto imediato**! Se você quiser fechar um pacote com mais de um serviço, posso chamar nosso especialista no WhatsApp para liberar uma condição especial para você: [Falar no WhatsApp](https://wa.me/5567993174612).\n\nQual serviço você gostaria de fechar hoje com desconto?`,
-      needsHumanHandoff: false,
-    };
-  }
-
-  // 15. Garantia
-  const guaranteeKeywords = ['garantia', 'tem garantia', 'qual a garantia', 'seguro'];
-  if (guaranteeKeywords.some((k) => q.includes(k))) {
-    return {
-      reply: `Você tem **15 dias de garantia total**! Se tiver qualquer problema, resolvemos sem burocracia.\n\nQuer iniciar seu projeto com total segurança e garantia?`,
-      needsHumanHandoff: false,
-    };
-  }
-
-  // 16. Objeção Preço / Vou pensar
-  const objectionKeywords = ['achei alto', 'achei caro', 'vou pensar', 'muito caro', 'pensar', 'valor alto'];
-  if (objectionKeywords.some((k) => q.includes(k))) {
-    return {
-      reply: `Entendo perfeitamente! Mas vale lembrar que todos os nossos serviços são de alto desempenho para alavancar Negócios Locais, o que economiza tempo e gera mais vendas para você.\n\nQuer que eu te mostre a opção de parcelamento em até 3x sem juros para caber tranquilo no seu orçamento?`,
-      needsHumanHandoff: false,
-    };
-  }
-
-  // 17. Formas de Pagamento
-  const paymentKeywords = ['forma de pagamento', 'formas de pagamento', 'como pagar', 'parcela', 'parcelamento', 'cartão', 'cartao', 'pix', 'débito', 'debito'];
-  if (paymentKeywords.some((k) => q.includes(k))) {
-    return {
-      reply: `Aceitamos **PIX (com 5% de desconto imediato!)**, **Cartão de Crédito em até 3x sem juros** e **Cartão de Débito**.\n\nQual dessas formas de pagamento você prefere?`,
-      needsHumanHandoff: false,
-    };
-  }
-
-  // 18. Localização e Horário de Funcionamento
-  const locationKeywords = ['onde fica', 'onde vocês ficam', 'onde voces ficam', 'localização', 'localizacao', 'endereço', 'endereco', 'horário', 'horario', 'ponta porã', 'ponta pora', 'qual a cidade', 'cidade'];
-  if (locationKeywords.some((k) => q.includes(k))) {
-    return {
-      reply: `Estamos sediados em **Ponta Porã - MS** e atendemos clientes em todo o Brasil!\n\nNosso horário de funcionamento é de Segunda a Sexta, das 08h às 18h e Sábado, das 08h às 12h.\n\nComo a Start Mkt Local pode ajudar a sua empresa hoje?`,
+      reply: `Oi! Tudo bem? 😊 Eu sou a ${cfg.botName}, da ${cfg.companyName}.\nPosso te ajudar com site, Google Meu Negócio, anúncios e mais.\nQual é o seu nome e o que você tá buscando pro seu negócio?`,
       needsHumanHandoff: false,
     };
   }
@@ -603,13 +621,16 @@ function findKnowledgeBaseAnswer(
   return null;
 }
 
-// Fallback response generator according to Golden Rules
-function getFallbackResponse(query: string): string {
-  const kbMatch = findKnowledgeBaseAnswer(query, config);
+// Fallback response generator according to Regras Inegociáveis
+function getFallbackResponse(
+  query: string,
+  history: Array<{ role: string; text: string }> = []
+): string {
+  const kbMatch = findKnowledgeBaseAnswer(query, config, history);
   if (kbMatch) return kbMatch.reply;
 
-  // Golden Rule 1: Fidelidade aos dados - se perguntar algo fora do documento
-  return `Para te confirmar esse detalhe específico sem erro, vou te passar o contato direto do nosso especialista: [Link de Contato/WhatsApp: https://wa.me/5567993174612].\n\nPosso te adiantar informações sobre Criação de Sites, Biosites com IA, Avaliacard, Google Meu Negócio ou Gestão de Tráfego?`;
+  // Regra Inegociável #3: se perguntar algo fora do documento
+  return `Para te confirmar esse detalhe específico sem erro, vou te passar o contato direto do nosso especialista: https://wa.me/5567993174612`;
 }
 
 // Check if human handoff should be triggered
@@ -623,12 +644,13 @@ function checkHumanHandoff(text: string, reply: string): boolean {
     'consultor',
     'reclamação',
     'suporte humano',
+    'contato direto do nosso especialista',
   ];
   const textLower = (text + ' ' + reply).toLowerCase();
   return triggerWords.some((w) => textLower.includes(w));
 }
 
-// API Router setup (supports standalone Express, Vite proxy, and Vercel Serverless Functions)
+// API Router setup (supports standalone Express, Vite proxy, Vercel & Netlify Serverless Functions)
 const apiRouter = express.Router();
 apiRouter.use(express.json({ limit: '20mb' }));
 
@@ -643,7 +665,6 @@ apiRouter.post('/config', (req, res) => {
   try {
     const updates = req.body;
     config = { ...config, ...updates };
-    // Clear cache if addendum updated
     if (updates.systemPromptAddendum !== undefined) {
       cachedSemanticIndex = null;
     }
@@ -683,7 +704,7 @@ apiRouter.post('/semantic-test', (req, res) => {
   }
 });
 
-// Chat endpoint with Instant Knowledge Base Matcher + Ultra-Fast Gemini 3.1 Flash Lite
+// Chat endpoint with Humanized WhatsApp Intelligence + Guardrails
 apiRouter.post('/chat', async (req, res) => {
   const { message, history = [] } = req.body;
 
@@ -691,24 +712,25 @@ apiRouter.post('/chat', async (req, res) => {
     return res.status(400).json({ error: 'Mensagem inválida' });
   }
 
-  // 1. FAST PATH (< 20ms): Check instant knowledge base matcher first
-  const kbMatch = findKnowledgeBaseAnswer(message, config);
-  if (kbMatch) {
+  // 1. Check strict out-of-scope guardrails first (Regra Inegociável #3)
+  const strictGuardrail = checkStrictGuardrail(message);
+  if (strictGuardrail) {
     return res.json({
-      reply: kbMatch.reply,
-      needsHumanHandoff: kbMatch.needsHumanHandoff,
+      reply: strictGuardrail.reply,
+      needsHumanHandoff: strictGuardrail.needsHumanHandoff,
       isFallback: false,
-      source: 'knowledge_base_instant',
+      source: 'strict_guardrail',
     });
   }
 
-  // 2. AI PATH: Open-ended conversation with gemini-3.1-flash-lite (minimal thinking) & 2.8s race timeout
+  // 2. If Gemini API Key is present, use Gemini with full conversation history & humanized prompt
   const systemInstruction = buildSystemPrompt();
 
   try {
     if (!process.env.GEMINI_API_KEY) {
-      const reply = getFallbackResponse(message);
-      const needsHumanHandoff = checkHumanHandoff(message, reply);
+      const kbMatch = findKnowledgeBaseAnswer(message, config, history);
+      const reply = kbMatch ? kbMatch.reply : getFallbackResponse(message, history);
+      const needsHumanHandoff = kbMatch ? kbMatch.needsHumanHandoff : checkHumanHandoff(message, reply);
       return res.json({
         reply,
         needsHumanHandoff,
@@ -716,9 +738,8 @@ apiRouter.post('/chat', async (req, res) => {
       });
     }
 
-    // Prepare contents with conversation history
     const contents: any[] = [];
-    for (const h of history.slice(-4)) {
+    for (const h of history.slice(-10)) {
       contents.push({
         role: h.role === 'assistant' || h.role === 'model' ? 'model' : 'user',
         parts: [{ text: h.text }],
@@ -729,7 +750,6 @@ apiRouter.post('/chat', async (req, res) => {
       parts: [{ text: message }],
     });
 
-    // Race Gemini against a 2800ms timeout to guarantee instant responsiveness
     const geminiCall = ai.models.generateContent({
       model: 'gemini-3.8-flash',
       contents: contents,
@@ -737,16 +757,17 @@ apiRouter.post('/chat', async (req, res) => {
         systemInstruction: systemInstruction,
         thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL },
         maxOutputTokens: 300,
-        temperature: 0.4,
+        temperature: 0.45,
       },
     });
 
     const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('GEMINI_TIMEOUT')), 5000)
+      setTimeout(() => reject(new Error('GEMINI_TIMEOUT')), 6000)
     );
 
     const response = await Promise.race([geminiCall, timeoutPromise]);
-    const reply = response.text || getFallbackResponse(message);
+    const rawReply = response.text || getFallbackResponse(message, history);
+    const reply = sanitizePureLinks(rawReply);
     const needsHumanHandoff = checkHumanHandoff(message, reply);
 
     res.json({
@@ -755,8 +776,7 @@ apiRouter.post('/chat', async (req, res) => {
       isFallback: false,
     });
   } catch (err: any) {
-    // If timeout or 503 spike, seamlessly respond using knowledge base synthesizer without user delay
-    const reply = getFallbackResponse(message);
+    const reply = getFallbackResponse(message, history);
     const needsHumanHandoff = checkHumanHandoff(message, reply);
     res.json({
       reply,
@@ -848,7 +868,8 @@ Instruções para você, LIA (${config.botRole} da ${config.companyName}):
     );
 
     const response = await Promise.race([geminiCall, timeoutPromise]);
-    const reply = response.text || (isPdf ? 'Documento PDF analisado com sucesso.' : 'Imagem analisada com sucesso.');
+    const rawReply = response.text || (isPdf ? 'Documento PDF analisado com sucesso.' : 'Imagem analisada com sucesso.');
+    const reply = sanitizePureLinks(rawReply);
     const needsHumanHandoff = checkHumanHandoff(message || fileName, reply);
 
     res.json({
@@ -860,8 +881,8 @@ Instruções para você, LIA (${config.botRole} da ${config.companyName}):
   } catch (err: any) {
     console.error('Gemini Multimodal Error:', err);
     const reply = isPdf
-      ? `Consegui receber o seu documento PDF "${fileName}"! Para te passar todos os detalhes e valores específicos sem erro, vou avisar nosso especialista: [Falar no WhatsApp](https://wa.me/5567993174612).`
-      : `Recebi a sua imagem com sucesso! Já registrei aqui. Quer que eu te passe mais detalhes sobre nossos serviços no WhatsApp? [Falar no WhatsApp](https://wa.me/5567993174612)`;
+      ? `Recebi o seu documento PDF "${fileName}"! Para te confirmar esse detalhe específico sem erro, vou te passar o contato direto do nosso especialista: https://wa.me/5567993174612`
+      : `Recebi a sua imagem! Vamos analisar juntos no WhatsApp: https://wa.me/5567993174612`;
     res.json({
       reply,
       fileDescription: isPdf ? `PDF: ${fileName}` : `Imagem: ${fileName}`,
@@ -912,37 +933,37 @@ apiRouter.post('/webhook/whatsapp', async (req, res) => {
     let messageText = messageObj?.text?.body || req.body?.message || '';
 
     if (msgType === 'audio' || msgType === 'voice') {
-      messageText = messageText || 'Mensagem de áudio recebida via WhatsApp: "Gostaria de saber os serviços e preços"';
+      messageText = messageText || 'Oi, quanto custa um site?';
     }
 
     if (!messageText) {
       return res.status(200).json({ status: 'ignored_empty_message' });
     }
 
-    // Process message: first check instant knowledge base matcher
+    // Process message: check strict guardrails first, then Gemini or humanized fallback
     let botReply = '';
-    const kbMatch = findKnowledgeBaseAnswer(messageText, config);
-    if (kbMatch) {
-      botReply = kbMatch.reply;
+    const strictGuardrail = checkStrictGuardrail(messageText);
+    if (strictGuardrail) {
+      botReply = strictGuardrail.reply;
     } else if (process.env.GEMINI_API_KEY) {
       try {
         const geminiCall = ai.models.generateContent({
-          model: 'gemini-3.1-flash-lite',
-          contents: `[MENSAGEM DO CLIENTE WHATSAPP]: ${messageText}`,
+          model: 'gemini-3.8-flash',
+          contents: messageText,
           config: {
             systemInstruction: buildSystemPrompt(),
             thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL },
-            maxOutputTokens: 250,
-            temperature: 0.5,
+            maxOutputTokens: 280,
+            temperature: 0.45,
           },
         });
 
         const timeoutPromise = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('WEBHOOK_TIMEOUT')), 2800)
+          setTimeout(() => reject(new Error('WEBHOOK_TIMEOUT')), 4500)
         );
 
         const response = await Promise.race([geminiCall, timeoutPromise]);
-        botReply = response.text || getFallbackResponse(messageText);
+        botReply = sanitizePureLinks(response.text || getFallbackResponse(messageText));
       } catch (e) {
         botReply = getFallbackResponse(messageText);
       }
